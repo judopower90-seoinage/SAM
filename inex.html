@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>営業行動週次管理システム - Sales Activity Management</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for summary visual analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Plus Jakarta Sans, Noto Sans JP, Playfair Display (for C.P.O Logo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '"Noto Sans JP"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    },
+                    colors: {
+                        solid: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0284c7', // Solid Strong Sky/Blue
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                            900: '#082f49',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif; 
+            background-color: #f1f5f9;
+            min-height: 100vh;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .sidebar-scrollbar::-webkit-scrollbar { width: 3px; }
+        .sidebar-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+        .sortable-th { cursor: pointer; user-select: none; transition: background-color 0.1s ease; }
+        .sortable-th:hover { background-color: #e2e8f0; }
+        .solid-card {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
+        }
+        .nav-item-active {
+            background-color: #1e293b;
+            color: #38bdf8;
+            border-left: 3px solid #38bdf8;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="text-solid-900 antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden selection:bg-brand-500 selection:text-white">
+
+    <!-- Mobile Top Header Bar -->
+    <header class="md:hidden bg-solid-950 text-white px-4 py-3 flex items-center justify-between border-b border-solid-800 z-40 sticky top-0">
+        <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded bg-brand-500 flex items-center justify-center text-white text-sm font-bold shadow-xs">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div>
+                <h1 class="text-sm font-bold tracking-tight">Sales Activity Management</h1>
+                <p class="text-[10px] text-brand-300">営業行動週次管理</p>
+            </div>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="p-2 rounded text-solid-300 hover:text-white hover:bg-solid-800 transition">
+            <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+    </header>
+
+    <!-- Sidebar Backdrop for Mobile -->
+    <div id="mobileBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-solid-950/70 z-40 hidden md:hidden transition-opacity duration-200"></div>
+
+    <!-- LEFT SIDEBAR (Solid Dark Navy Theme) -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-solid-950 text-solid-300 flex flex-col justify-between border-r border-solid-800 transform -translate-x-full md:translate-x-0 md:static md:h-screen shrink-0 transition-transform duration-200 ease-in-out">
+        
+        <!-- Sidebar Top / Brand -->
+        <div class="p-5 border-b border-solid-800">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded bg-brand-500 flex items-center justify-center text-white text-base shadow-xs">
+                        <i class="fa-solid fa-city"></i>
+                    </div>
+                    <div>
+                        <div class="text-white font-extrabold text-sm tracking-tight leading-tight flex items-center">
+                            <span>営業行動管理</span>
+                        </div>
+                        <p class="text-[11px] text-brand-400 font-semibold tracking-wider">Sales Activity Management</p>
+                    </div>
+                </div>
+                <!-- Close Button on Mobile -->
+                <button onclick="toggleMobileSidebar(false)" class="md:hidden text-solid-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar Navigation Menu -->
+        <div class="flex-1 px-3 py-4 space-y-1 overflow-y-auto sidebar-scrollbar">
+            <div class="px-3 pb-2 text-[10px] uppercase font-bold tracking-wider text-solid-500">
+                メインメニュー
+            </div>
+
+            <!-- Menu Item 1: Action Table -->
+            <button id="sideTabTable" onclick="switchView('table'); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left nav-item-active">
+                <i class="fa-solid fa-list-check text-sm text-brand-400 w-5 text-center"></i>
+                <span class="flex-1">担当別行動管理表</span>
+            </button>
+
+            <!-- Menu Item 2: Analytics -->
+            <button id="sideTabAnalytics" onclick="switchView('analytics'); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left">
+                <i class="fa-solid fa-chart-pie text-sm text-amber-400 w-5 text-center"></i>
+                <span class="flex-1">週次分析</span>
+            </button>
+
+            <!-- Menu Item 3: History -->
+            <button id="sideTabHistory" onclick="switchView('history'); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left">
+                <i class="fa-solid fa-clock-rotate-left text-sm text-indigo-400 w-5 text-center"></i>
+                <span class="flex-1">全履歴タイムライン</span>
+            </button>
+
+            <!-- Action: New Week Creation -->
+            <div class="pt-3 px-1">
+                <button onclick="openNewWeekModal(); toggleMobileSidebar(false);" class="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-solid-800 text-brand-300 hover:text-white rounded text-xs font-semibold border border-solid-800 transition-colors">
+                    <i class="fa-solid fa-calendar-plus text-brand-400"></i>
+                    <span>新規週を作成</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar Bottom / Utilities & C.P.O Logo (White on Dark Navy) -->
+        <div class="p-4 border-t border-solid-800 bg-solid-950 space-y-2.5">
+            <div class="px-1 text-[10px] uppercase font-bold tracking-wider text-solid-500">
+                データ管理 (フォルダ選択)
+            </div>
+
+            <!-- Save Data Button -->
+            <button onclick="saveDataToFile()" class="w-full flex items-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-brand-500 text-white rounded text-xs font-semibold border border-solid-800 hover:border-brand-500 transition-colors group">
+                <i class="fa-solid fa-floppy-disk text-brand-400 group-hover:text-white text-xs w-4 text-center"></i>
+                <span>データ保存</span>
+            </button>
+
+            <!-- Restore Data Button -->
+            <button onclick="restoreDataFromFile()" class="w-full flex items-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-solid-800 text-solid-200 hover:text-white rounded text-xs font-semibold border border-solid-800 transition-colors group">
+                <i class="fa-solid fa-arrow-rotate-left text-indigo-400 group-hover:text-white text-xs w-4 text-center"></i>
+                <span>データ復元</span>
+            </button>
+
+            <!-- Hidden file input fallback for restore -->
+            <input type="file" id="fallbackFileInput" accept=".json" class="hidden" onchange="handleFallbackFileSelected(event)">
+
+            <!-- C.P.O (Creative Project Office) White Logo on Dark Navy Background -->
+            <div class="pt-2">
+                <div class="bg-solid-900/80 rounded p-3.5 border border-solid-800/80 flex flex-col items-center justify-center transition-colors hover:border-solid-700">
+                    <div class="text-2xl font-serif font-black tracking-tight text-white leading-none select-none">
+                        C.P.O
+                    </div>
+                    <div class="text-[9.5px] font-bold text-solid-300 tracking-wider mt-1.5 select-none font-sans whitespace-nowrap">
+                        Creative Project Office
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="flex-1 flex flex-col min-w-0 md:h-screen md:overflow-y-auto custom-scrollbar">
+
+        <!-- Global Toast Notification -->
+        <div id="toastNotification" class="fixed top-5 right-5 z-50 transform transition-all duration-200 translate-y-[-10px] opacity-0 pointer-events-none">
+            <div id="toastContent" class="flex items-center space-x-2 bg-solid-900 text-white px-4 py-2.5 rounded border border-solid-700 text-xs font-semibold shadow-md">
+                <i id="toastIcon" class="fa-solid fa-check text-emerald-400 text-sm"></i>
+                <span id="toastMessage">処理が完了しました</span>
+            </div>
+        </div>
+
+        <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4">
+
+            <!-- VIEW 1: Action Table View (Main First View) -->
+            <section id="tableView" class="space-y-4">
+                <!-- Header Banner for Table -->
+                <div class="solid-card p-4 rounded-lg flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded bg-solid-100 text-brand-500 border border-solid-200 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-users-viewfinder"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-solid-900 uppercase tracking-wide">担当者別 営業行動管理表</h2>
+                            <p class="text-xs text-solid-500 mt-0.5">各営業担当者の進行案件、受注計上金額、行動内容、および次回アクションを管理・更新できます。</p>
+                        </div>
+                    </div>
+                    <!-- Legend for Rank Badges -->
+                    <div class="flex items-center space-x-3 text-xs bg-solid-50 px-3 py-1.5 rounded border border-solid-200">
+                        <span class="font-bold text-solid-600 mr-1"><i class="fa-solid fa-tags text-brand-500 mr-1"></i>ランク:</span>
+                        <span class="inline-flex items-center"><span class="w-4 h-4 rounded-sm bg-emerald-600 text-white font-bold text-[9px] flex items-center justify-center mr-1">A</span> 契約・完了</span>
+                        <span class="inline-flex items-center"><span class="w-4 h-4 rounded-sm bg-brand-500 text-white font-bold text-[9px] flex items-center justify-center mr-1">B</span> 受注見込</span>
+                        <span class="inline-flex items-center"><span class="w-4 h-4 rounded-sm bg-solid-200 text-solid-700 border border-solid-300 font-bold text-[9px] flex items-center justify-center mr-1">C</span> アプローチ～見積 / フォロー</span>
+                    </div>
+                </div>
+
+                <!-- Week Selector Toolbar in Table View -->
+                <div class="solid-card rounded-lg p-3.5 flex flex-col md:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center space-x-2 w-full md:w-auto justify-between md:justify-start">
+                        <button onclick="navigateWeek(-1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="前週へ">
+                            <i class="fa-solid fa-chevron-left text-xs"></i>
+                        </button>
+                        <div class="text-center md:text-left">
+                            <div id="tableWeekTitle" class="text-base font-bold text-solid-900 leading-tight">-</div>
+                            <div id="tableWeekRange" class="text-xs text-brand-500 font-semibold mt-0.5 flex items-center justify-center md:justify-start">
+                                <i class="fa-regular fa-calendar mr-1 opacity-80"></i>
+                                <span>-</span>
+                            </div>
+                        </div>
+                        <button onclick="navigateWeek(1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="次週へ">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center space-x-2 w-full md:w-auto justify-end">
+                        <select id="tableWeekSelectDropdown" onchange="onWeekDropdownChange(this.value)" class="bg-white border border-solid-300 text-solid-800 text-xs rounded focus:ring-1 focus:ring-brand-500 focus:border-brand-500 p-2 font-semibold">
+                            <!-- Dynamic Week Options -->
+                        </select>
+                        <button onclick="jumpToCurrentWeek()" class="px-3 py-2 bg-solid-100 hover:bg-solid-200 text-solid-800 text-xs font-semibold rounded border border-solid-300 transition-colors whitespace-nowrap">
+                            今週へ移動
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters & Sort Bar -->
+                <div class="solid-card p-3 rounded-lg flex flex-wrap items-center justify-between gap-2.5">
+                    <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                        <!-- Sales Rep Filter -->
+                        <div class="flex items-center space-x-1.5">
+                            <label class="text-xs font-semibold text-solid-500 whitespace-nowrap"><i class="fa-solid fa-user-tie text-brand-500 mr-1"></i>担当者:</label>
+                            <select id="filterRep" onchange="renderTable()" class="bg-white border border-solid-300 text-solid-800 text-xs rounded p-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500 font-medium">
+                                <option value="ALL">全員表示</option>
+                            </select>
+                        </div>
+
+                        <!-- Status Filter -->
+                        <div class="flex items-center space-x-1.5">
+                            <label class="text-xs font-semibold text-solid-500 whitespace-nowrap"><i class="fa-solid fa-filter text-brand-500 mr-1"></i>状態:</label>
+                            <select id="filterStatus" onchange="renderTable()" class="bg-white border border-solid-300 text-solid-800 text-xs rounded p-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500 font-medium">
+                                <option value="ALL">すべて</option>
+                                <option value="アプローチ中">アプローチ中</option>
+                                <option value="提案・商談中">提案・商談中</option>
+                                <option value="見積提出">見積提出</option>
+                                <option value="受注見込">受注見込</option>
+                                <option value="契約">契約</option>
+                                <option value="完了">完了</option>
+                                <option value="失注">失注</option>
+                                <option value="継続フォロー">継続フォロー</option>
+                            </select>
+                        </div>
+
+                        <!-- Sort Selection Dropdown -->
+                        <div class="flex items-center space-x-1.5">
+                            <label class="text-xs font-semibold text-solid-500 whitespace-nowrap"><i class="fa-solid fa-arrow-down-short-wide text-brand-500 mr-1"></i>並び順:</label>
+                            <select id="sortSelect" onchange="onSortDropdownChange(this.value)" class="bg-white border border-solid-300 text-solid-800 text-xs rounded p-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500 font-medium">
+                                <option value="default_asc">登録順（標準）</option>
+                                <option value="rank_asc">ランク（A → B → C 順 ↑）</option>
+                                <option value="rank_desc">ランク（C → B → A 順 ↓）</option>
+                                <option value="rep_asc">担当者（あいうえお順 ↑）</option>
+                                <option value="rep_desc">担当者（あいうえお順 逆順 ↓）</option>
+                                <option value="title_asc">案件名順 (五十音 ↑)</option>
+                                <option value="title_desc">案件名順 (五十音 逆順 ↓)</option>
+                                <option value="amount_desc">計上金額順 (高い順 ↓)</option>
+                                <option value="amount_asc">計上金額順 (低い順 ↑)</option>
+                                <option value="detail_asc">内容順 (五十音 ↑)</option>
+                                <option value="status_asc">ステータス（進捗順 ↑）</option>
+                                <option value="status_desc">ステータス（進捗逆順 ↓）</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="relative w-full sm:w-60">
+                        <input type="text" id="filterSearch" oninput="renderTable()" placeholder="案件名・内容・担当者を検索..." class="w-full bg-white border border-solid-300 text-solid-800 text-xs rounded pl-7 pr-2.5 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        <i class="fa-solid fa-magnifying-glass absolute left-2 top-2 text-solid-400 text-xs"></i>
+                    </div>
+                </div>
+
+                <!-- Sales Activity Table Container -->
+                <div class="solid-card rounded-lg overflow-hidden">
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse min-w-[900px]">
+                            <thead>
+                                <tr class="bg-solid-100 border-b border-solid-200 text-[11px] uppercase tracking-wider text-solid-600 font-bold">
+                                    <!-- Clickable Sortable TH: Rank -->
+                                    <th class="py-3 px-3 w-16 text-center sortable-th" onclick="toggleSort('rank')" title="クリックでランク順（A/B/C）に並び替え">
+                                        <div class="flex items-center justify-center space-x-1">
+                                            <span>ランク</span>
+                                            <span id="sortIconRank" class="text-solid-400 text-xs"><i class="fa-solid fa-sort"></i></span>
+                                        </div>
+                                    </th>
+                                    <!-- Clickable Sortable TH: Rep -->
+                                    <th class="py-3 px-3 w-32 sortable-th" onclick="toggleSort('rep')" title="クリックで担当者あいうえお順に並び替え">
+                                        <div class="flex items-center justify-between">
+                                            <span>担当者</span>
+                                            <span id="sortIconRep" class="text-solid-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
+                                        </div>
+                                    </th>
+                                    <!-- Clickable Sortable TH: Title -->
+                                    <th class="py-3 px-3 w-44 sortable-th" onclick="toggleSort('title')" title="クリックで案件名順に並び替え">
+                                        <div class="flex items-center justify-between">
+                                            <span>案件名</span>
+                                            <span id="sortIconTitle" class="text-solid-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
+                                        </div>
+                                    </th>
+                                    <!-- Clickable Sortable TH: Amount -->
+                                    <th class="py-3 px-3 w-32 sortable-th" onclick="toggleSort('amount')" title="クリックで受注計上金額順に並び替え">
+                                        <div class="flex items-center justify-between">
+                                            <span>受注計上金額</span>
+                                            <span id="sortIconAmount" class="text-solid-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
+                                        </div>
+                                    </th>
+                                    <!-- Clickable Sortable TH: Detail -->
+                                    <th class="py-3 px-3 sortable-th" onclick="toggleSort('detail')" title="クリックで内容順に並び替え">
+                                        <div class="flex items-center justify-between">
+                                            <span>内容 (今週の行動・次回アクション)</span>
+                                            <span id="sortIconDetail" class="text-solid-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
+                                        </div>
+                                    </th>
+                                    <!-- Clickable Sortable TH: Status -->
+                                    <th class="py-3 px-3 w-32 sortable-th" onclick="toggleSort('status')" title="クリックでステータス進捗順に並び替え">
+                                        <div class="flex items-center justify-between">
+                                            <span>ステータス</span>
+                                            <span id="sortIconStatus" class="text-solid-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
+                                        </div>
+                                    </th>
+                                    <th class="py-3 px-3 w-14 text-center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="actionTableBody" class="divide-y divide-solid-200 text-xs text-solid-700 bg-white">
+                                <!-- Dynamic Table Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="tableEmptyState" class="hidden p-10 text-center bg-white">
+                        <div class="w-12 h-12 bg-solid-100 text-solid-400 border border-solid-200 rounded flex items-center justify-center mx-auto mb-2">
+                            <i class="fa-regular fa-folder-open text-xl"></i>
+                        </div>
+                        <h3 class="text-xs font-bold text-solid-800 uppercase tracking-wide">登録された案件・行動データがありません</h3>
+                        <p class="text-[11px] text-solid-500 mt-0.5">下の「行動・案件を新規登録」ボタンから案件を登録してください。</p>
+                    </div>
+                </div>
+
+                <!-- CENTERED ADD BUTTON BELOW TABLE (Solid Primary Button) -->
+                <div class="flex justify-center items-center py-2">
+                    <button onclick="openRecordModal()" class="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded border border-brand-600 shadow-sm transition-colors flex items-center space-x-2">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>行動・案件を新規登録</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- VIEW 2: Analytics Dashboard (Weekly Analysis View) -->
+            <section id="analyticsView" class="hidden space-y-4">
+                <!-- Week Selector Toolbar (Analytics) -->
+                <div class="solid-card rounded-lg p-3.5 flex flex-col md:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center space-x-2 w-full md:w-auto justify-between md:justify-start">
+                        <button onclick="navigateWeek(-1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="前週へ">
+                            <i class="fa-solid fa-chevron-left text-xs"></i>
+                        </button>
+                        <div class="text-center md:text-left">
+                            <div id="analyticsWeekTitle" class="text-base font-bold text-solid-900 leading-tight">-</div>
+                            <div id="analyticsWeekRange" class="text-xs text-brand-500 font-semibold mt-0.5 flex items-center justify-center md:justify-start">
+                                <i class="fa-regular fa-calendar mr-1 opacity-80"></i>
+                                <span>-</span>
+                            </div>
+                        </div>
+                        <button onclick="navigateWeek(1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="次週へ">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center space-x-2 w-full md:w-auto justify-end">
+                        <select id="weekSelectDropdown" onchange="onWeekDropdownChange(this.value)" class="bg-white border border-solid-300 text-solid-800 text-xs rounded focus:ring-1 focus:ring-brand-500 focus:border-brand-500 p-2 font-semibold">
+                            <!-- Dynamic Week Options -->
+                        </select>
+                        <button onclick="jumpToCurrentWeek()" class="px-3 py-2 bg-solid-100 hover:bg-solid-200 text-solid-800 text-xs font-semibold rounded border border-solid-300 transition-colors whitespace-nowrap">
+                            今週へ移動
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Grid (Solid Clean Metrics) -->
+                <div id="kpiContainer" class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                    <div class="solid-card p-4 rounded-lg flex flex-col justify-between">
+                        <div class="flex justify-between items-center text-solid-500 text-xs font-semibold">
+                            <span>総案件数</span>
+                            <i class="fa-solid fa-folder text-solid-400"></i>
+                        </div>
+                        <div class="mt-3 flex items-baseline justify-between">
+                            <span id="kpiTotalCount" class="text-2xl font-black text-solid-900">0</span>
+                            <span class="text-xs font-semibold text-solid-400">件</span>
+                        </div>
+                    </div>
+
+                    <div class="solid-card p-4 rounded-lg flex flex-col justify-between">
+                        <div class="flex justify-between items-center text-brand-500 text-xs font-semibold">
+                            <span>アプローチ中</span>
+                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                        </div>
+                        <div class="mt-3 flex items-baseline justify-between">
+                            <span id="kpiApproachCount" class="text-2xl font-black text-brand-500">0</span>
+                            <span class="text-xs font-semibold text-brand-400">件</span>
+                        </div>
+                    </div>
+
+                    <div class="solid-card p-4 rounded-lg flex flex-col justify-between">
+                        <div class="flex justify-between items-center text-amber-600 text-xs font-semibold">
+                            <span>提案・商談中</span>
+                            <i class="fa-solid fa-comments text-xs"></i>
+                        </div>
+                        <div class="mt-3 flex items-baseline justify-between">
+                            <span id="kpiProposalCount" class="text-2xl font-black text-amber-600">0</span>
+                            <span class="text-xs font-semibold text-amber-400">件</span>
+                        </div>
+                    </div>
+
+                    <div class="solid-card p-4 rounded-lg flex flex-col justify-between">
+                        <div class="flex justify-between items-center text-indigo-600 text-xs font-semibold">
+                            <span>見積提出済</span>
+                            <i class="fa-solid fa-file-invoice-dollar text-xs"></i>
+                        </div>
+                        <div class="mt-3 flex items-baseline justify-between">
+                            <span id="kpiEstimateCount" class="text-2xl font-black text-indigo-600">0</span>
+                            <span class="text-xs font-semibold text-indigo-400">件</span>
+                        </div>
+                    </div>
+
+                    <div class="solid-card p-4 rounded-lg flex flex-col justify-between col-span-2 lg:col-span-1">
+                        <div class="flex justify-between items-center text-emerald-600 text-xs font-semibold">
+                            <span>受注見込</span>
+                            <i class="fa-solid fa-circle-check text-xs"></i>
+                        </div>
+                        <div class="mt-3 flex items-baseline justify-between">
+                            <span id="kpiExpectedCount" class="text-2xl font-black text-emerald-600">0</span>
+                            <span class="text-xs font-semibold text-emerald-400">件</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Charts & Summary Area (Row 1) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <!-- Status Breakdown Chart -->
+                    <div class="solid-card p-4 rounded-lg">
+                        <h3 class="text-xs font-bold text-solid-900 mb-3 flex items-center uppercase tracking-wide">
+                            <i class="fa-solid fa-chart-pie text-brand-500 mr-2 text-xs"></i>今週のステータス別内訳
+                        </h3>
+                        <div class="relative h-60 flex items-center justify-center">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Revenue / Order Summary Card -->
+                    <div class="solid-card p-4 rounded-lg flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xs font-bold text-solid-900 mb-3 flex items-center uppercase tracking-wide">
+                                <i class="fa-solid fa-yen-sign text-emerald-600 mr-2 text-xs"></i>今週の受注計上サマリー
+                            </h3>
+                            <div class="bg-solid-50 p-3.5 rounded border border-solid-200 space-y-2">
+                                <div class="text-[11px] font-semibold text-solid-500">今週の登録案件における計上総額</div>
+                                <div class="text-2xl font-black text-solid-900 tracking-tight" id="analyticsTotalAmount">
+                                    ¥0
+                                </div>
+                                <div class="text-xs text-solid-500" id="analyticsAmountDetail">
+                                    計上対象案件: 0件
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Month breakdown list -->
+                        <div class="mt-3 pt-3 border-t border-solid-200">
+                            <div class="text-xs font-bold text-solid-700 mb-2 flex items-center justify-between">
+                                <span>月別 計上予定一覧</span>
+                                <i class="fa-regular fa-calendar-check text-brand-500 text-xs"></i>
+                            </div>
+                            <div id="analyticsMonthBreakdown" class="space-y-1 max-h-28 overflow-y-auto custom-scrollbar pr-1 text-xs">
+                                <!-- Dynamic Month Breakdown Items -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Sales Rep Revenue Breakdown (Row 2) -->
+                <div class="solid-card p-4 rounded-lg space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-solid-200 pb-2.5">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-users-gear text-emerald-600 text-sm"></i>
+                            <div>
+                                <h3 class="text-xs font-bold text-solid-900 uppercase tracking-wide">担当者別 売上計上実績一覧（合算）</h3>
+                                <p class="text-[11px] text-solid-500">今週売上（計上金額）を登録した担当者ごとの合算金額および計上件数の一覧です</p>
+                            </div>
+                        </div>
+                        <div id="repRevenueSummaryBadge" class="text-xs font-semibold px-2.5 py-0.5 bg-solid-100 text-solid-700 rounded border border-solid-300">
+                            計上担当者: 0名
+                        </div>
+                    </div>
+
+                    <!-- Rep Revenue Grid / List Container -->
+                    <div id="repRevenueListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+                        <!-- Dynamic Rep Revenue Cards -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 3: Historical Logs -->
+            <section id="historyView" class="hidden space-y-4">
+                <div class="solid-card p-4 rounded-lg space-y-3">
+                    <div class="flex items-center justify-between border-b border-solid-200 pb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <i class="fa-solid fa-timeline text-brand-500 text-sm"></i>
+                            <div>
+                                <h3 class="text-xs font-bold text-solid-900 uppercase tracking-wide">全週次履歴タイムライン</h3>
+                                <p class="text-[11px] text-solid-500">保存されている過去週の行動ログおよび進捗の履歴一覧です</p>
+                            </div>
+                        </div>
+                        <span id="historyTotalCount" class="bg-solid-100 border border-solid-300 text-solid-700 px-2.5 py-0.5 rounded text-xs font-bold">全 0 週分</span>
+                    </div>
+
+                    <div id="historyListContainer" class="space-y-3 pt-1">
+                        <!-- Dynamic History Cards -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+
+    <!-- MODAL: Add / Edit Record (Solid Modal) -->
+    <div id="recordModal" class="fixed inset-0 bg-solid-950/70 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-lg max-w-lg w-full shadow-lg border border-solid-300 overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-5 py-3.5 bg-solid-100 border-b border-solid-200 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-pen text-brand-500 text-xs"></i>
+                    <h3 id="recordModalTitle" class="text-xs font-bold text-solid-900 uppercase tracking-wider">案件・行動の追加</h3>
+                </div>
+                <button onclick="closeRecordModal()" class="w-6 h-6 rounded hover:bg-solid-200 text-solid-500 hover:text-solid-800 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Modal Form -->
+            <form id="recordForm" onsubmit="handleSaveRecord(event)" class="p-5 space-y-3.5">
+                <input type="hidden" id="recordId">
+
+                <!-- Rep Input with Autocomplete Datalist -->
+                <div>
+                    <label class="block text-xs font-bold text-solid-700 mb-1">担当者名 <span class="text-rose-600">*</span></label>
+                    <input type="text" id="modalRep" list="repSuggestions" required placeholder="担当者名を入力（例: 山田 太郎）" class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-brand-500 focus:border-brand-500 font-medium">
+                    <datalist id="repSuggestions">
+                        <!-- Dynamic Rep Suggestions -->
+                    </datalist>
+                </div>
+
+                <!-- Deal Name -->
+                <div>
+                    <label class="block text-xs font-bold text-solid-700 mb-1">案件名 <span class="text-rose-600">*</span></label>
+                    <input type="text" id="modalTitle" required placeholder="例: △△物産 システム刷新提案" class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                </div>
+
+                <!-- Amount & Accounting Month Row -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 bg-solid-50 rounded border border-solid-200">
+                    <div>
+                        <label class="block text-xs font-bold text-solid-700 mb-1">
+                            受注計上金額 (円)
+                            <span class="text-[10px] font-normal text-solid-500 ml-1">任意</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-2.5 top-2 text-xs text-solid-400 font-bold">¥</span>
+                            <input type="number" id="modalAmount" min="0" step="1000" oninput="toggleAccountingMonthVisibility()" placeholder="例: 1500000" class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded pl-6 pr-2.5 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500 font-semibold">
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Month Dropdown -->
+                    <div id="accountingMonthWrapper" class="hidden">
+                        <label class="block text-xs font-bold text-solid-700 mb-1">
+                            計上月 <span class="text-rose-600">*</span>
+                        </label>
+                        <select id="modalMonth" class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded p-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500 font-semibold">
+                            <option value="">月を選択</option>
+                            <option value="1月">1月</option>
+                            <option value="2月">2月</option>
+                            <option value="3月">3月</option>
+                            <option value="4月">4月</option>
+                            <option value="5月">5月</option>
+                            <option value="6月">6月</option>
+                            <option value="7月">7月</option>
+                            <option value="8月">8月</option>
+                            <option value="9月">9月</option>
+                            <option value="10月">10月</option>
+                            <option value="11月">11月</option>
+                            <option value="12月">12月</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Status Select -->
+                <div>
+                    <label class="block text-xs font-bold text-solid-700 mb-1">ステータス <span class="text-rose-600">*</span></label>
+                    <select id="modalStatus" required class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-brand-500 focus:border-brand-500 font-medium">
+                        <option value="アプローチ中">アプローチ中</option>
+                        <option value="提案・商談中">提案・商談中</option>
+                        <option value="見積提出">見積提出</option>
+                        <option value="受注見込">受注見込</option>
+                        <option value="契約">契約</option>
+                        <option value="完了">完了</option>
+                        <option value="失注">失注</option>
+                        <option value="継続フォロー">継続フォロー</option>
+                    </select>
+                </div>
+
+                <!-- Details / Actions -->
+                <div>
+                    <label class="block text-xs font-bold text-solid-700 mb-1">内容 (行動履歴・次回アクション) <span class="text-rose-600">*</span></label>
+                    <textarea id="modalDetail" rows="3" required placeholder="今週実施した行動や次回のアクション予定を記入してください。&#10;例: 提案書提示及び役員プレゼン完了。見込み価格の合意形成中。次回9/4役員会決議。" class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-brand-500 focus:border-brand-500"></textarea>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex items-center justify-end space-x-2 pt-2 border-t border-solid-200">
+                    <button type="button" onclick="closeRecordModal()" class="px-4 py-2 border border-solid-300 text-solid-700 text-xs font-semibold rounded hover:bg-solid-100 transition-colors">
+                        キャンセル
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded border border-brand-600 shadow-xs transition-colors">
+                        保存する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Create New Week -->
+    <div id="newWeekModal" class="fixed inset-0 bg-solid-950/70 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-lg max-w-md w-full shadow-lg border border-solid-300 overflow-hidden">
+            <div class="px-5 py-3.5 bg-solid-100 border-b border-solid-200 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-calendar-plus text-brand-500 text-xs"></i>
+                    <h3 class="text-xs font-bold text-solid-900 uppercase tracking-wider">新規週の追加作成</h3>
+                </div>
+                <button onclick="closeNewWeekModal()" class="w-6 h-6 rounded hover:bg-solid-200 text-solid-500 hover:text-solid-800 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+            <form onsubmit="handleCreateNewWeek(event)" class="p-5 space-y-3.5">
+                <div>
+                    <label class="block text-xs font-bold text-solid-700 mb-1">開始月曜日の日付</label>
+                    <input type="date" id="newWeekStartDate" required class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                    <p class="text-[10px] text-solid-500 mt-1">※指定日の属する週の月曜日が自動でセットされます。</p>
+                </div>
+
+                <div class="bg-solid-50 border border-solid-200 rounded p-3 space-y-1.5">
+                    <label class="flex items-start space-x-2 cursor-pointer">
+                        <input type="checkbox" id="carryOverUnfinished" checked class="mt-0.5 rounded text-brand-500 focus:ring-brand-500">
+                        <div>
+                            <span class="text-xs font-bold text-solid-900">前週の未完了案件を引き継ぐ</span>
+                            <p class="text-[10px] text-solid-600 leading-tight mt-0.5">「契約」「完了」「失注」以外の進行中案件を次週のデータとしてコピーします。</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-2 border-t border-solid-200">
+                    <button type="button" onclick="closeNewWeekModal()" class="px-4 py-2 border border-solid-300 text-solid-700 text-xs font-semibold rounded hover:bg-solid-100">
+                        キャンセル
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded border border-brand-600 shadow-xs">
+                        週を作成して切り替える
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Restore Confirmation Modal -->
+    <div id="confirmRestoreModal" class="fixed inset-0 bg-solid-950/70 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-lg max-w-md w-full shadow-lg border border-solid-300 p-5 space-y-3">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded bg-amber-100 text-amber-700 border border-amber-300 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h3 class="text-xs font-bold text-solid-900 uppercase tracking-wider">データ復元の確認</h3>
+                    <p class="text-[11px] text-solid-500">既存のデータが上書きされます</p>
+                </div>
+            </div>
+            <p id="restoreModalSummary" class="text-xs text-solid-700 bg-solid-50 p-3 rounded border border-solid-200 leading-relaxed">
+                読み込んだファイルで現在の管理データをすべて上書き復元します。よろしいですか？
+            </p>
+            <div class="flex items-center justify-end space-x-2 pt-2 border-t border-solid-200">
+                <button type="button" onclick="closeRestoreModal()" class="px-3.5 py-1.5 border border-solid-300 text-solid-700 text-xs font-semibold rounded hover:bg-solid-100">
+                    キャンセル
+                </button>
+                <button type="button" onclick="executeRestore()" class="px-4 py-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded border border-brand-600 shadow-xs">
+                    復元を実行する
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA STRUCTURE & INITIAL STATE ---
+        const STATUS_PIPELINE_ORDER = {
+            'アプローチ中': 1,
+            '提案・商談中': 2,
+            '見積提出': 3,
+            '受注見込': 4,
+            '契約': 5,
+            '完了': 6,
+            '継続フォロー': 7,
+            '失注': 8
+        };
+
+        const RANK_ORDER = {
+            'A': 1,
+            'B': 2,
+            'C': 3,
+            '-': 4
+        };
+
+        // Solid Rank Badge Definitions
+        function getRankBadge(status) {
+            switch(status) {
+                case '契約':
+                case '完了':
+                    return {
+                        rank: 'A',
+                        bgClass: 'bg-emerald-600 text-white border-emerald-700',
+                        title: 'ランクA (契約・完了)'
+                    };
+                case '受注見込':
+                    return {
+                        rank: 'B',
+                        bgClass: 'bg-brand-500 text-white border-brand-600',
+                        title: 'ランクB (受注見込)'
+                    };
+                case 'アプローチ中':
+                case '提案・商談中':
+                case '見積提出':
+                case '継続フォロー':
+                    return {
+                        rank: 'C',
+                        bgClass: 'bg-solid-200 text-solid-800 border-solid-300',
+                        title: 'ランクC (アプローチ・商談・見積・継続フォロー)'
+                    };
+                default:
+                    return {
+                        rank: '-',
+                        bgClass: 'bg-solid-100 text-solid-400 border-solid-200',
+                        title: status || '未分類'
+                    };
+            }
+        }
+
+        function formatDateStr(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function getMondayOfDate(d) {
+            const date = new Date(d);
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(date.setDate(diff));
+        }
+
+        function getWeekInfo(mondayStr) {
+            const mon = new Date(mondayStr + 'T00:00:00');
+            const sun = new Date(mon);
+            sun.setDate(sun.getDate() + 6);
+
+            const year = mon.getFullYear();
+            const month = mon.getMonth() + 1;
+
+            const firstDay = new Date(year, mon.getMonth(), 1);
+            const dayOffset = (firstDay.getDay() + 6) % 7;
+            const weekNum = Math.floor((mon.getDate() + dayOffset - 1) / 7) + 1;
+
+            const days = ['日', '月', '火', '水', '木', '金', '土'];
+            const formatWithDay = (d) => {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const date = String(d.getDate()).padStart(2, '0');
+                return `${y}/${m}/${date} (${days[d.getDay()]})`;
+            };
+
+            return {
+                title: `${year}年 ${month}月 第${weekNum}週`,
+                range: `${formatWithDay(mon)} ～ ${formatWithDay(sun)}`
+            };
+        }
+
+        const initialMonday = getMondayOfDate(new Date());
+        const initialMondayStr = formatDateStr(initialMonday);
+
+        let appState = {
+            currentWeekMondayStr: initialMondayStr,
+            reps: [],
+            weeks: {
+                [initialMondayStr]: {
+                    mondayStr: initialMondayStr,
+                    records: []
+                }
+            },
+            sortKey: 'default',
+            sortDirection: 'asc'
+        };
+
+        let pendingRestoreData = null;
+        let statusChartInstance = null;
+
+        window.onload = function() {
+            updateRepList();
+            renderAll();
+            switchView('table');
+        };
+
+        // Mobile Sidebar Drawer Toggle
+        function toggleMobileSidebar(forceState) {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('mobileBackdrop');
+            const isCurrentlyHidden = sidebar.classList.contains('-translate-x-full');
+
+            const shouldOpen = typeof forceState === 'boolean' ? forceState : isCurrentlyHidden;
+
+            if (shouldOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        // Toast Notification Helper
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toastNotification');
+            const msgEl = document.getElementById('toastMessage');
+            const iconEl = document.getElementById('toastIcon');
+
+            msgEl.innerText = message;
+            if (isError) {
+                iconEl.className = 'fa-solid fa-circle-exclamation text-rose-400 text-xs';
+            } else {
+                iconEl.className = 'fa-solid fa-check text-emerald-400 text-xs';
+            }
+
+            toast.classList.remove('translate-y-[-10px]', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-10px]', 'opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+
+        // --- FILE SAVE / RESTORE IMPLEMENTATION ---
+        async function saveDataToFile() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const fileName = `営業行動管理データ_${y}${m}${d}.json`;
+
+            const exportPayload = {
+                version: '1.0',
+                exportedAt: new Date().toISOString(),
+                appState: appState
+            };
+            const jsonString = JSON.stringify(exportPayload, null, 2);
+
+            if (window.showSaveFilePicker) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: fileName,
+                        startIn: 'desktop',
+                        types: [{
+                            description: 'JSON ファイル (*.json)',
+                            accept: { 'application/json': ['.json'] }
+                        }]
+                    });
+                    const writable = await handle.createWritable();
+                    await writable.write(jsonString);
+                    await writable.close();
+                    showToast('選択した保存先にデータを保存しました');
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') {
+                        return;
+                    }
+                    console.warn('showSaveFilePicker failed, falling back to download:', err);
+                }
+            }
+
+            try {
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('データをファイルとして保存しました');
+            } catch (err) {
+                console.error('Data export error:', err);
+                showToast('データの保存に失敗しました', true);
+            }
+        }
+
+        async function restoreDataFromFile() {
+            if (window.showOpenFilePicker) {
+                try {
+                    const [handle] = await window.showOpenFilePicker({
+                        startIn: 'desktop',
+                        types: [{
+                            description: 'JSON ファイル (*.json)',
+                            accept: { 'application/json': ['.json'] }
+                        }],
+                        multiple: false
+                    });
+                    const file = await handle.getFile();
+                    const text = await file.text();
+                    parseAndConfirmRestore(text);
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') {
+                        return;
+                    }
+                    console.warn('showOpenFilePicker failed, falling back to file input:', err);
+                }
+            }
+
+            const fileInput = document.getElementById('fallbackFileInput');
+            fileInput.value = '';
+            fileInput.click();
+        }
+
+        function handleFallbackFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                parseAndConfirmRestore(e.target.result);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseAndConfirmRestore(jsonText) {
+            try {
+                const parsed = JSON.parse(jsonText);
+                let loadedState = null;
+
+                if (parsed.appState && parsed.appState.weeks) {
+                    loadedState = parsed.appState;
+                } else if (parsed.weeks) {
+                    loadedState = parsed;
+                } else {
+                    throw new Error('無効なデータ形式です');
+                }
+
+                pendingRestoreData = loadedState;
+
+                const weekCount = Object.keys(loadedState.weeks || {}).length;
+                let totalRecords = 0;
+                Object.values(loadedState.weeks || {}).forEach(w => {
+                    totalRecords += (w.records || []).length;
+                });
+
+                document.getElementById('restoreModalSummary').innerHTML = `
+                    読み込み対象: <strong class="text-solid-900">${weekCount} 週分</strong>（登録案件合計: <strong class="text-solid-900">${totalRecords} 件</strong>）<br>
+                    現在の管理データがすべて上書きされます。よろしいですか？
+                `;
+
+                document.getElementById('confirmRestoreModal').classList.remove('hidden');
+            } catch (err) {
+                console.error('File parsing error:', err);
+                showToast('有効なJSONデータファイルを指定してください', true);
+            }
+        }
+
+        function closeRestoreModal() {
+            document.getElementById('confirmRestoreModal').classList.add('hidden');
+            pendingRestoreData = null;
+        }
+
+        function executeRestore() {
+            if (!pendingRestoreData) return;
+
+            appState = {
+                currentWeekMondayStr: pendingRestoreData.currentWeekMondayStr || initialMondayStr,
+                reps: pendingRestoreData.reps || [],
+                weeks: pendingRestoreData.weeks || {},
+                sortKey: 'default',
+                sortDirection: 'asc'
+            };
+
+            if (!appState.weeks[appState.currentWeekMondayStr]) {
+                const firstKey = Object.keys(appState.weeks).sort().reverse()[0] || initialMondayStr;
+                appState.currentWeekMondayStr = firstKey;
+                if (!appState.weeks[firstKey]) {
+                    appState.weeks[firstKey] = { mondayStr: firstKey, records: [] };
+                }
+            }
+
+            closeRestoreModal();
+            renderAll();
+            showToast('データを正常に復元しました');
+        }
+
+        // Extract reps dynamically from all weeks' records
+        function updateRepList() {
+            const repSet = new Set();
+            Object.values(appState.weeks).forEach(week => {
+                (week.records || []).forEach(r => {
+                    if (r.rep && r.rep.trim()) {
+                        repSet.add(r.rep.trim());
+                    }
+                });
+            });
+
+            appState.reps = Array.from(repSet).sort((a, b) => a.localeCompare(b, 'ja'));
+
+            // Populate Filter Select
+            const filterSelect = document.getElementById('filterRep');
+            const currentFilterVal = filterSelect.value;
+            filterSelect.innerHTML = '<option value="ALL">全員表示</option>';
+            appState.reps.forEach(rep => {
+                filterSelect.innerHTML += `<option value="${rep}">${rep}</option>`;
+            });
+            if (appState.reps.includes(currentFilterVal)) {
+                filterSelect.value = currentFilterVal;
+            }
+
+            // Populate Datalist suggestions for the modal
+            const datalist = document.getElementById('repSuggestions');
+            if (datalist) {
+                datalist.innerHTML = appState.reps.map(r => `<option value="${r}"></option>`).join('');
+            }
+        }
+
+        function renderAll() {
+            updateRepList();
+            updateWeekHeaderAndDropdown();
+            renderKPIs();
+            renderTable();
+            renderAnalytics();
+            renderHistory();
+        }
+
+        function updateWeekHeaderAndDropdown() {
+            const currentMonStr = appState.currentWeekMondayStr;
+            const info = getWeekInfo(currentMonStr);
+
+            // Update Analytics Header & Table Header
+            document.getElementById('analyticsWeekTitle').innerText = info.title;
+            document.getElementById('analyticsWeekRange').innerHTML = `<i class="fa-regular fa-calendar mr-1 opacity-80"></i><span>${info.range}</span>`;
+            document.getElementById('tableWeekTitle').innerText = info.title;
+            document.getElementById('tableWeekRange').innerHTML = `<i class="fa-regular fa-calendar mr-1 opacity-80"></i><span>${info.range}</span>`;
+
+            // Populate Week Selector Dropdowns
+            const dropdown = document.getElementById('weekSelectDropdown');
+            const tableDropdown = document.getElementById('tableWeekSelectDropdown');
+            dropdown.innerHTML = '';
+            tableDropdown.innerHTML = '';
+
+            const sortedWeekKeys = Object.keys(appState.weeks).sort().reverse();
+            sortedWeekKeys.forEach(wKey => {
+                const wInfo = getWeekInfo(wKey);
+                const selectedAttr = wKey === currentMonStr ? 'selected' : '';
+                const optHtml = `<option value="${wKey}" ${selectedAttr}>${wInfo.title} (${wKey})</option>`;
+                dropdown.innerHTML += optHtml;
+                tableDropdown.innerHTML += optHtml;
+            });
+        }
+
+        function navigateWeek(direction) {
+            const curMon = new Date(appState.currentWeekMondayStr);
+            curMon.setDate(curMon.getDate() + (direction * 7));
+            const targetMonStr = formatDateStr(curMon);
+
+            if (!appState.weeks[targetMonStr]) {
+                appState.weeks[targetMonStr] = {
+                    mondayStr: targetMonStr,
+                    records: []
+                };
+            }
+
+            appState.currentWeekMondayStr = targetMonStr;
+            renderAll();
+        }
+
+        function onWeekDropdownChange(val) {
+            appState.currentWeekMondayStr = val;
+            renderAll();
+        }
+
+        function jumpToCurrentWeek() {
+            const todayMonStr = formatDateStr(getMondayOfDate(new Date()));
+            if (!appState.weeks[todayMonStr]) {
+                appState.weeks[todayMonStr] = {
+                    mondayStr: todayMonStr,
+                    records: []
+                };
+            }
+            appState.currentWeekMondayStr = todayMonStr;
+            renderAll();
+        }
+
+        function getCurrentRecords() {
+            const w = appState.weeks[appState.currentWeekMondayStr];
+            return w ? w.records : [];
+        }
+
+        function renderKPIs() {
+            const records = getCurrentRecords();
+            document.getElementById('kpiTotalCount').innerText = records.length;
+
+            const counts = {
+                'アプローチ中': 0,
+                '提案・商談中': 0,
+                '見積提出': 0,
+                '受注見込': 0,
+                '契約': 0,
+                '完了': 0
+            };
+
+            records.forEach(r => {
+                if (counts[r.status] !== undefined) {
+                    counts[r.status]++;
+                }
+            });
+
+            document.getElementById('kpiApproachCount').innerText = counts['アプローチ中'];
+            document.getElementById('kpiProposalCount').innerText = counts['提案・商談中'];
+            document.getElementById('kpiEstimateCount').innerText = counts['見積提出'];
+            document.getElementById('kpiExpectedCount').innerText = counts['受注見込'];
+        }
+
+        function getStatusBadgeHTML(status) {
+            let colorClasses = '';
+            switch(status) {
+                case 'アプローチ中':
+                    colorClasses = 'bg-sky-50 text-sky-800 border-sky-300';
+                    break;
+                case '提案・商談中':
+                    colorClasses = 'bg-amber-50 text-amber-800 border-amber-300';
+                    break;
+                case '見積提出':
+                    colorClasses = 'bg-indigo-50 text-indigo-800 border-indigo-300';
+                    break;
+                case '受注見込':
+                    colorClasses = 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold';
+                    break;
+                case '契約':
+                    colorClasses = 'bg-teal-50 text-teal-800 border-teal-300 font-bold';
+                    break;
+                case '完了':
+                    colorClasses = 'bg-cyan-50 text-cyan-900 border-cyan-300 font-bold';
+                    break;
+                case '失注':
+                    colorClasses = 'bg-rose-50 text-rose-800 border-rose-300';
+                    break;
+                default:
+                    colorClasses = 'bg-solid-100 text-solid-800 border-solid-300';
+            }
+            return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border status-badge ${colorClasses}">${status}</span>`;
+        }
+
+        function toggleAccountingMonthVisibility() {
+            const amountVal = document.getElementById('modalAmount').value.trim();
+            const monthWrapper = document.getElementById('accountingMonthWrapper');
+            const monthSelect = document.getElementById('modalMonth');
+
+            if (amountVal && Number(amountVal) > 0) {
+                monthWrapper.classList.remove('hidden');
+                monthSelect.setAttribute('required', 'required');
+            } else {
+                monthWrapper.classList.add('hidden');
+                monthSelect.removeAttribute('required');
+                monthSelect.value = '';
+            }
+        }
+
+        // --- SORTING LOGIC FOR ALL FIELDS ---
+        function toggleSort(key) {
+            if (appState.sortKey === key) {
+                appState.sortDirection = appState.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                appState.sortKey = key;
+                appState.sortDirection = (key === 'amount') ? 'desc' : 'asc';
+            }
+            syncSortDropdown();
+            renderTable();
+        }
+
+        function onSortDropdownChange(val) {
+            const [key, dir] = val.split('_');
+            appState.sortKey = key;
+            appState.sortDirection = dir || 'asc';
+            updateSortHeaderIcons();
+            renderTable();
+        }
+
+        function syncSortDropdown() {
+            const select = document.getElementById('sortSelect');
+            const val = `${appState.sortKey}_${appState.sortDirection}`;
+            if (select) {
+                select.value = val;
+                if (!select.value) {
+                    select.value = 'default_asc';
+                }
+            }
+            updateSortHeaderIcons();
+        }
+
+        function updateSortHeaderIcons() {
+            const iconRank = document.getElementById('sortIconRank');
+            const iconRep = document.getElementById('sortIconRep');
+            const iconTitle = document.getElementById('sortIconTitle');
+            const iconAmount = document.getElementById('sortIconAmount');
+            const iconDetail = document.getElementById('sortIconDetail');
+            const iconStatus = document.getElementById('sortIconStatus');
+
+            const allIcons = [iconRank, iconRep, iconTitle, iconAmount, iconDetail, iconStatus];
+            allIcons.forEach(ic => {
+                if (ic) ic.innerHTML = '<i class="fa-solid fa-sort text-solid-400"></i>';
+            });
+
+            const activeIcon = appState.sortDirection === 'asc' 
+                ? '<i class="fa-solid fa-arrow-down-short-wide text-brand-500 font-bold"></i>' 
+                : '<i class="fa-solid fa-arrow-up-wide-short text-brand-500 font-bold"></i>';
+
+            if (appState.sortKey === 'rank' && iconRank) iconRank.innerHTML = activeIcon;
+            if (appState.sortKey === 'rep' && iconRep) iconRep.innerHTML = activeIcon;
+            if (appState.sortKey === 'title' && iconTitle) iconTitle.innerHTML = activeIcon;
+            if (appState.sortKey === 'amount' && iconAmount) iconAmount.innerHTML = activeIcon;
+            if (appState.sortKey === 'detail' && iconDetail) iconDetail.innerHTML = activeIcon;
+            if (appState.sortKey === 'status' && iconStatus) iconStatus.innerHTML = activeIcon;
+        }
+
+        function renderTable() {
+            updateSortHeaderIcons();
+
+            const tbody = document.getElementById('actionTableBody');
+            const emptyState = document.getElementById('tableEmptyState');
+
+            const filterRep = document.getElementById('filterRep').value;
+            const filterStatus = document.getElementById('filterStatus').value;
+            const filterSearch = document.getElementById('filterSearch').value.toLowerCase().trim();
+
+            const records = [...getCurrentRecords()];
+
+            // 1. Filtering
+            let filtered = records.filter(r => {
+                if (filterRep !== 'ALL' && r.rep !== filterRep) return false;
+                if (filterStatus !== 'ALL' && r.status !== filterStatus) return false;
+                if (filterSearch) {
+                    const matchTitle = (r.title || '').toLowerCase().includes(filterSearch);
+                    const matchDetail = (r.detail || '').toLowerCase().includes(filterSearch);
+                    const matchRep = (r.rep || '').toLowerCase().includes(filterSearch);
+                    const matchMonth = (r.month || '').toLowerCase().includes(filterSearch);
+                    const rankObj = getRankBadge(r.status);
+                    const matchRank = rankObj.rank.toLowerCase().includes(filterSearch);
+                    if (!matchTitle && !matchDetail && !matchRep && !matchMonth && !matchRank) return false;
+                }
+                return true;
+            });
+
+            // 2. Sorting across all fields
+            if (appState.sortKey === 'rank') {
+                filtered.sort((a, b) => {
+                    const rankA = getRankBadge(a.status).rank;
+                    const rankB = getRankBadge(b.status).rank;
+                    const orderA = RANK_ORDER[rankA] || 99;
+                    const orderB = RANK_ORDER[rankB] || 99;
+                    const comp = orderA - orderB;
+                    return appState.sortDirection === 'asc' ? comp : -comp;
+                });
+            } else if (appState.sortKey === 'rep') {
+                filtered.sort((a, b) => {
+                    const comp = (a.rep || '').localeCompare(b.rep || '', 'ja');
+                    return appState.sortDirection === 'asc' ? comp : -comp;
+                });
+            } else if (appState.sortKey === 'title') {
+                filtered.sort((a, b) => {
+                    const comp = (a.title || '').localeCompare(b.title || '', 'ja');
+                    return appState.sortDirection === 'asc' ? comp : -comp;
+                });
+            } else if (appState.sortKey === 'amount') {
+                filtered.sort((a, b) => {
+                    const valA = Number(a.amount || 0);
+                    const valB = Number(b.amount || 0);
+                    return appState.sortDirection === 'asc' ? valA - valB : valB - valA;
+                });
+            } else if (appState.sortKey === 'detail') {
+                filtered.sort((a, b) => {
+                    const comp = (a.detail || '').localeCompare(b.detail || '', 'ja');
+                    return appState.sortDirection === 'asc' ? comp : -comp;
+                });
+            } else if (appState.sortKey === 'status') {
+                filtered.sort((a, b) => {
+                    const orderA = STATUS_PIPELINE_ORDER[a.status] || 99;
+                    const orderB = STATUS_PIPELINE_ORDER[b.status] || 99;
+                    const comp = orderA - orderB;
+                    return appState.sortDirection === 'asc' ? comp : -comp;
+                });
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            let html = '';
+
+            filtered.forEach(r => {
+                const amtNumber = Number(r.amount || 0);
+                let amountDisplay = '<span class="text-solid-400 font-normal">-</span>';
+
+                if (amtNumber > 0) {
+                    const formatted = amtNumber.toLocaleString('ja-JP');
+                    const monthBadge = r.month 
+                        ? `<span class="ml-1 px-1.5 py-0.2 rounded bg-solid-100 text-brand-600 border border-solid-200 text-[10px] font-bold">${r.month}計上</span>` 
+                        : '';
+                    amountDisplay = `
+                        <div class="flex flex-col">
+                            <span class="font-bold text-solid-900 tracking-tight">¥${formatted}</span>
+                            <div>${monthBadge}</div>
+                        </div>
+                    `;
+                }
+
+                const rankBadge = getRankBadge(r.status);
+
+                html += `
+                    <tr class="hover:bg-solid-50 transition-colors">
+                        <!-- Rank Column -->
+                        <td class="py-2.5 px-3 text-center">
+                            <div class="flex justify-center items-center">
+                                <span class="w-6 h-6 rounded ${rankBadge.bgClass} border flex items-center justify-center text-[11px] font-black tracking-tight" title="${rankBadge.title}">
+                                    ${rankBadge.rank}
+                                </span>
+                            </div>
+                        </td>
+                        <!-- Rep Column -->
+                        <td class="py-2.5 px-3 font-semibold text-solid-900 whitespace-nowrap">
+                            ${r.rep}
+                        </td>
+                        <!-- Title Column -->
+                        <td class="py-2.5 px-3 font-semibold text-solid-900">${r.title}</td>
+                        <!-- Amount Column -->
+                        <td class="py-2.5 px-3 text-xs">${amountDisplay}</td>
+                        <!-- Detail Column -->
+                        <td class="py-2.5 px-3 text-solid-600 leading-relaxed whitespace-pre-line text-xs">${r.detail}</td>
+                        <!-- Status Column -->
+                        <td class="py-2.5 px-3">${getStatusBadgeHTML(r.status)}</td>
+                        <!-- Action Column -->
+                        <td class="py-2.5 px-3 text-center">
+                            <div class="flex items-center justify-center space-x-1.5 text-solid-400">
+                                <button onclick="openRecordModal('${r.id}')" class="p-1 hover:text-brand-500 hover:bg-solid-100 rounded transition-colors" title="編集">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </button>
+                                <button onclick="deleteRecord('${r.id}')" class="p-1 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors" title="削除">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function openRecordModal(editId = null) {
+            const modal = document.getElementById('recordModal');
+            const form = document.getElementById('recordForm');
+            const titleEl = document.getElementById('recordModalTitle');
+
+            form.reset();
+
+            if (editId) {
+                const records = getCurrentRecords();
+                const record = records.find(r => r.id === editId);
+                if (record) {
+                    document.getElementById('recordId').value = record.id;
+                    document.getElementById('modalRep').value = record.rep;
+                    document.getElementById('modalTitle').value = record.title;
+                    document.getElementById('modalAmount').value = record.amount && record.amount > 0 ? record.amount : '';
+                    document.getElementById('modalMonth').value = record.month || '';
+                    document.getElementById('modalStatus').value = record.status;
+                    document.getElementById('modalDetail').value = record.detail;
+                    titleEl.innerText = '案件・行動の編集';
+                }
+            } else {
+                document.getElementById('recordId').value = '';
+                document.getElementById('modalAmount').value = '';
+                document.getElementById('modalMonth').value = '';
+                titleEl.innerText = '案件・行動の追加';
+            }
+
+            toggleAccountingMonthVisibility();
+            modal.classList.remove('hidden');
+        }
+
+        function closeRecordModal() {
+            document.getElementById('recordModal').classList.add('hidden');
+        }
+
+        function handleSaveRecord(e) {
+            e.preventDefault();
+            const recordId = document.getElementById('recordId').value;
+            const rep = document.getElementById('modalRep').value.trim();
+            const title = document.getElementById('modalTitle').value.trim();
+            const amount = Number(document.getElementById('modalAmount').value) || 0;
+            const month = amount > 0 ? document.getElementById('modalMonth').value : '';
+            const status = document.getElementById('modalStatus').value;
+            const detail = document.getElementById('modalDetail').value.trim();
+
+            const records = getCurrentRecords();
+
+            if (recordId) {
+                const index = records.findIndex(r => r.id === recordId);
+                if (index !== -1) {
+                    records[index] = { id: recordId, rep, title, amount, month, status, detail };
+                }
+            } else {
+                const newRecord = {
+                    id: 'rec-' + Date.now(),
+                    rep,
+                    title,
+                    amount,
+                    month,
+                    status,
+                    detail
+                };
+                records.push(newRecord);
+            }
+
+            closeRecordModal();
+            renderAll();
+        }
+
+        function deleteRecord(id) {
+            const records = getCurrentRecords();
+            const index = records.findIndex(r => r.id === id);
+            if (index !== -1) {
+                records.splice(index, 1);
+                renderAll();
+            }
+        }
+
+        function openNewWeekModal() {
+            const curMon = new Date(appState.currentWeekMondayStr);
+            curMon.setDate(curMon.getDate() + 7);
+            document.getElementById('newWeekStartDate').value = formatDateStr(curMon);
+            document.getElementById('newWeekModal').classList.remove('hidden');
+        }
+
+        function closeNewWeekModal() {
+            document.getElementById('newWeekModal').classList.add('hidden');
+        }
+
+        function handleCreateNewWeek(e) {
+            e.preventDefault();
+            const inputDate = new Date(document.getElementById('newWeekStartDate').value);
+            const monStr = formatDateStr(getMondayOfDate(inputDate));
+            const carryOver = document.getElementById('carryOverUnfinished').checked;
+
+            if (!appState.weeks[monStr]) {
+                appState.weeks[monStr] = {
+                    mondayStr: monStr,
+                    records: []
+                };
+            }
+
+            if (carryOver) {
+                const sourceRecords = getCurrentRecords();
+                const unfinished = sourceRecords.filter(r => r.status !== '契約' && r.status !== '失注' && r.status !== '完了');
+
+                unfinished.forEach(r => {
+                    appState.weeks[monStr].records.push({
+                        id: 'rec-' + Date.now() + Math.floor(Math.random() * 1000),
+                        rep: r.rep,
+                        title: r.title,
+                        amount: r.amount || 0,
+                        month: r.month || '',
+                        status: r.status,
+                        detail: `[前週より引継ぎ] ${r.detail}`
+                    });
+                });
+            }
+
+            appState.currentWeekMondayStr = monStr;
+            closeNewWeekModal();
+            renderAll();
+        }
+
+        function renderAnalytics() {
+            const records = getCurrentRecords();
+
+            // 1. Status Doughnut Chart (Solid Modern Palette)
+            const statusLabels = ['アプローチ中', '提案・商談中', '見積提出', '受注見込', '契約', '完了', '失注', '継続フォロー'];
+            const statusCounts = statusLabels.map(st => records.filter(r => r.status === st).length);
+            const statusColors = ['#0284c7', '#d97706', '#4f46e5', '#059669', '#0d9488', '#0891b2', '#e11d48', '#64748b'];
+
+            const hasAnyData = records.length > 0;
+            const displayCounts = hasAnyData ? statusCounts : [0, 0, 0, 0, 0, 0, 0, 0];
+
+            const ctxStatus = document.getElementById('statusChart').getContext('2d');
+            if (statusChartInstance) statusChartInstance.destroy();
+
+            statusChartInstance = new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: statusLabels,
+                    datasets: [{
+                        data: displayCounts,
+                        backgroundColor: statusColors,
+                        borderWidth: 1,
+                        borderColor: '#ffffff',
+                        hoverOffset: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { 
+                            position: 'right',
+                            labels: {
+                                boxWidth: 10,
+                                boxHeight: 10,
+                                padding: 10,
+                                font: {
+                                    size: 10,
+                                    family: "'Noto Sans JP', sans-serif"
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. Revenue & Accounting Month Analytics Summary
+            let totalAmount = 0;
+            const monthMap = {};
+            const repRevenueMap = {};
+
+            records.forEach(r => {
+                const amt = Number(r.amount || 0);
+                if (amt > 0) {
+                    totalAmount += amt;
+                    const m = r.month || '未指定';
+                    monthMap[m] = (monthMap[m] || 0) + amt;
+
+                    // Group by Sales Rep
+                    const repName = r.rep && r.rep.trim() ? r.rep.trim() : '担当者未設定';
+                    if (!repRevenueMap[repName]) {
+                        repRevenueMap[repName] = { total: 0, count: 0, items: [] };
+                    }
+                    repRevenueMap[repName].total += amt;
+                    repRevenueMap[repName].count += 1;
+                    repRevenueMap[repName].items.push({
+                        title: r.title,
+                        amount: amt,
+                        month: r.month,
+                        status: r.status
+                    });
+                }
+            });
+
+            const countWithAmount = records.filter(r => Number(r.amount || 0) > 0).length;
+            document.getElementById('analyticsTotalAmount').innerText = '¥' + totalAmount.toLocaleString('ja-JP');
+            document.getElementById('analyticsAmountDetail').innerText = `計上対象案件: ${countWithAmount} 件 (全 ${records.length} 件中)`;
+
+            // Month breakdown
+            const monthContainer = document.getElementById('analyticsMonthBreakdown');
+            const monthKeys = Object.keys(monthMap);
+
+            if (monthKeys.length === 0) {
+                monthContainer.innerHTML = '<p class="text-solid-400 italic py-1 text-xs">今週の計上金額データはありません</p>';
+            } else {
+                monthContainer.innerHTML = monthKeys.map(m => `
+                    <div class="flex items-center justify-between p-1.5 rounded bg-white border border-solid-200">
+                        <span class="font-bold text-solid-700">${m}</span>
+                        <span class="font-bold text-brand-600">¥${monthMap[m].toLocaleString('ja-JP')}</span>
+                    </div>
+                `).join('');
+            }
+
+            // 3. Render Sales Rep Revenue Breakdown (Grouped by Rep with aggregated amounts and counts)
+            const repRevenueContainer = document.getElementById('repRevenueListContainer');
+            const repSummaryBadge = document.getElementById('repRevenueSummaryBadge');
+            const sortedRepKeys = Object.keys(repRevenueMap).sort((a, b) => repRevenueMap[b].total - repRevenueMap[a].total);
+
+            repSummaryBadge.innerText = `計上担当者: ${sortedRepKeys.length} 名`;
+
+            if (sortedRepKeys.length === 0) {
+                repRevenueContainer.innerHTML = `
+                    <div class="col-span-full py-6 text-center text-solid-400 text-xs bg-solid-50 rounded border border-dashed border-solid-300">
+                        <i class="fa-regular fa-money-bill-1 text-lg text-solid-300 mb-1"></i>
+                        <p>今週売上（計上金額）を計上した担当者はまだいません。</p>
+                    </div>
+                `;
+            } else {
+                repRevenueContainer.innerHTML = sortedRepKeys.map((repName, idx) => {
+                    const repData = repRevenueMap[repName];
+                    return `
+                        <div class="bg-white p-3.5 rounded-lg border border-solid-200 shadow-xs space-y-2.5">
+                            <!-- Card Header -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2 overflow-hidden">
+                                    <div class="w-7 h-7 rounded bg-solid-800 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                                        ${repName.substring(0, 1)}
+                                    </div>
+                                    <div class="truncate">
+                                        <div class="font-bold text-solid-900 text-xs truncate">${repName}</div>
+                                        <div class="text-[10px] text-solid-500">ランク #${idx + 1}</div>
+                                    </div>
+                                </div>
+                                <span class="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-300 text-emerald-800 text-[11px] font-bold whitespace-nowrap">
+                                    計上: ${repData.count} 件
+                                </span>
+                            </div>
+
+                            <!-- Aggregated Total Amount -->
+                            <div class="bg-solid-50 p-2 rounded border border-solid-200">
+                                <div class="text-[10px] font-semibold text-solid-500">合計計上金額</div>
+                                <div class="text-base font-black text-brand-600 tracking-tight mt-0.5">
+                                    ¥${repData.total.toLocaleString('ja-JP')}
+                                </div>
+                            </div>
+
+                            <!-- Items Breakdown List -->
+                            <div class="space-y-1 pt-0.5">
+                                <div class="text-[10px] font-bold text-solid-600 flex items-center justify-between">
+                                    <span>計上内訳</span>
+                                    <span>${repData.count}案件</span>
+                                </div>
+                                <div class="max-h-24 overflow-y-auto custom-scrollbar space-y-1 pr-0.5">
+                                    ${repData.items.map(item => `
+                                        <div class="text-[11px] p-1.5 rounded bg-solid-50 border border-solid-200 flex items-center justify-between gap-1.5">
+                                            <div class="truncate flex-1">
+                                                <span class="font-medium text-solid-800 truncate block">${item.title}</span>
+                                                ${item.month ? `<span class="text-[9px] text-brand-600 font-bold bg-white px-1 py-0.2 rounded border border-solid-200 inline-block">${item.month}計上</span>` : ''}
+                                            </div>
+                                            <span class="font-bold text-solid-900 text-[11px] whitespace-nowrap">
+                                                ¥${item.amount.toLocaleString('ja-JP')}
+                                            </span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyListContainer');
+            const totalEl = document.getElementById('historyTotalCount');
+
+            const sortedKeys = Object.keys(appState.weeks).sort().reverse();
+            totalEl.innerText = `全 ${sortedKeys.length} 週分`;
+
+            let html = '';
+
+            sortedKeys.forEach(wKey => {
+                const weekObj = appState.weeks[wKey];
+                const info = getWeekInfo(wKey);
+                const isCurrent = wKey === appState.currentWeekMondayStr;
+
+                const weekTotalAmt = weekObj.records.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+                html += `
+                    <div class="border ${isCurrent ? 'border-brand-500 bg-brand-50/20' : 'border-solid-200 bg-white'} rounded-lg p-3.5 transition-colors">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-solid-200 pb-2.5">
+                            <div class="flex items-center space-x-2">
+                                <span class="font-bold text-solid-900 text-xs">${info.title}</span>
+                                <span class="text-xs text-brand-600 font-medium">(${info.range})</span>
+                                ${isCurrent ? '<span class="bg-brand-500 text-white text-[9px] px-1.5 py-0.2 rounded font-bold">表示中</span>' : ''}
+                            </div>
+                            <div class="flex items-center space-x-2.5">
+                                <span class="text-xs text-solid-600">登録案件: <strong class="text-solid-900">${weekObj.records.length}</strong> 件</span>
+                                ${weekTotalAmt > 0 ? `<span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">計上総額: ¥${weekTotalAmt.toLocaleString()}</span>` : ''}
+                                <button onclick="onWeekDropdownChange('${wKey}'); switchView('analytics');" class="text-xs text-brand-500 hover:text-brand-600 font-bold flex items-center bg-solid-50 hover:bg-solid-100 px-2 py-1 rounded border border-solid-200 transition-colors">
+                                    この週を表示 <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Mini summary list -->
+                        <div class="mt-2.5 space-y-1">
+                            ${weekObj.records.length === 0 ? '<p class="text-xs text-solid-400 italic">登録データなし</p>' : ''}
+                            ${weekObj.records.slice(0, 3).map(r => {
+                                const rank = getRankBadge(r.status);
+                                return `
+                                <div class="flex items-center justify-between text-xs text-solid-700 bg-solid-50 border border-solid-200 p-2 rounded">
+                                    <div class="flex items-center space-x-2 overflow-hidden">
+                                        <span class="w-4 h-4 rounded-sm ${rank.bgClass} border flex items-center justify-center text-[9px] font-black">${rank.rank}</span>
+                                        <span class="font-semibold text-solid-900 whitespace-nowrap">${r.rep}</span>
+                                        <span class="text-solid-300">|</span>
+                                        <span class="truncate text-solid-700 font-medium">${r.title}</span>
+                                        ${r.amount > 0 ? `<span class="text-[10px] font-bold text-brand-600">(¥${Number(r.amount).toLocaleString()}${r.month ? ' / ' + r.month : ''})</span>` : ''}
+                                    </div>
+                                    <span class="ml-2 whitespace-nowrap">${getStatusBadgeHTML(r.status)}</span>
+                                </div>
+                                `;
+                            }).join('')}
+                            ${weekObj.records.length > 3 ? `<p class="text-[10px] text-solid-500 text-right pt-0.5">+ 他 ${weekObj.records.length - 3} 件</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // VIEW SWITCHER
+        function switchView(viewName) {
+            document.getElementById('tableView').classList.add('hidden');
+            document.getElementById('analyticsView').classList.add('hidden');
+            document.getElementById('historyView').classList.add('hidden');
+
+            const defaultClasses = "w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left";
+            document.getElementById('sideTabTable').className = defaultClasses;
+            document.getElementById('sideTabAnalytics').className = defaultClasses;
+            document.getElementById('sideTabHistory').className = defaultClasses;
+
+            if (viewName === 'analytics') {
+                document.getElementById('analyticsView').classList.remove('hidden');
+                document.getElementById('sideTabAnalytics').className = defaultClasses + " nav-item-active";
+                renderAnalytics();
+            } else if (viewName === 'table') {
+                document.getElementById('tableView').classList.remove('hidden');
+                document.getElementById('sideTabTable').className = defaultClasses + " nav-item-active";
+                renderTable();
+            } else if (viewName === 'history') {
+                document.getElementById('historyView').classList.remove('hidden');
+                document.getElementById('sideTabHistory').className = defaultClasses + " nav-item-active";
+                renderHistory();
+            }
+        }
+    </script>
+</body>
+</html>
