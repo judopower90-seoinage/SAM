@@ -91,7 +91,10 @@
             </div>
             <div>
                 <h1 class="text-sm font-bold tracking-tight">Sales Activity Management</h1>
-                <p class="text-[10px] text-brand-300">営業行動週次管理</p>
+                <div class="flex items-center space-x-1.5 mt-0.5">
+                    <span id="mobileSyncDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+                    <span id="mobileSyncStatus" class="text-[10px] text-solid-300">同期完了</span>
+                </div>
             </div>
         </div>
         <button onclick="toggleMobileSidebar()" class="p-2 rounded text-solid-300 hover:text-white hover:bg-solid-800 transition">
@@ -123,6 +126,15 @@
                 <button onclick="toggleMobileSidebar(false)" class="md:hidden text-solid-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
+            </div>
+
+            <!-- Auto-save / Cloud Sync Status Badge -->
+            <div class="mt-3 px-2.5 py-1.5 rounded bg-solid-900 border border-solid-800 flex items-center justify-between">
+                <div class="flex items-center space-x-2 text-[11px]">
+                    <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="syncStatusText" class="text-solid-300 font-medium">クラウド保存: 同期中</span>
+                </div>
+                <i class="fa-solid fa-cloud text-xs text-brand-400"></i>
             </div>
         </div>
 
@@ -180,13 +192,13 @@
             <!-- Save Data Button -->
             <button onclick="saveDataToFile()" class="w-full flex items-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-brand-500 text-white rounded text-xs font-semibold border border-solid-800 hover:border-brand-500 transition-colors group">
                 <i class="fa-solid fa-floppy-disk text-brand-400 group-hover:text-white text-xs w-4 text-center"></i>
-                <span>データ保存</span>
+                <span>データバックアップ保存</span>
             </button>
 
             <!-- Restore Data Button -->
             <button onclick="restoreDataFromFile()" class="w-full flex items-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-solid-800 text-solid-200 hover:text-white rounded text-xs font-semibold border border-solid-800 transition-colors group">
                 <i class="fa-solid fa-arrow-rotate-left text-indigo-400 group-hover:text-white text-xs w-4 text-center"></i>
-                <span>データ復元</span>
+                <span>ファイルから復元</span>
             </button>
 
             <!-- Hidden file input fallback for restore -->
@@ -229,7 +241,7 @@
                         </div>
                         <div>
                             <h2 class="text-sm font-bold text-solid-900 uppercase tracking-wide">担当者別 営業行動管理表</h2>
-                            <p class="text-xs text-solid-500 mt-0.5">各営業担当者の進行案件、受注計上金額、行動内容、懸念問題事項、および次回アクションを管理・更新できます。</p>
+                            <p class="text-xs text-solid-500 mt-0.5">入力したデータは自動的に安全保存されます。各営業担当者の進行案件、受注計上金額、行動内容、懸念問題事項を管理・更新できます。</p>
                         </div>
                     </div>
                     
@@ -875,7 +887,6 @@
             '-': 4
         };
 
-        // Solid Rank Badge Definitions
         function getRankBadge(status) {
             switch(status) {
                 case '契約':
@@ -968,10 +979,138 @@
         let pendingRestoreData = null;
         let statusChartInstance = null;
 
+        // --- CLOUD PERSISTENCE (FIRESTORE) IMPLEMENTATION ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let cloudSaveDebounceTimer = null;
+
+        function updateSyncBadge(status) {
+            const dot = document.getElementById('syncStatusDot');
+            const txt = document.getElementById('syncStatusText');
+            const mDot = document.getElementById('mobileSyncDot');
+            const mTxt = document.getElementById('mobileSyncStatus');
+
+            if (!dot || !txt) return;
+
+            if (status === 'syncing') {
+                dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
+                txt.innerText = 'クラウド保存: 保存中...';
+                if (mDot && mTxt) {
+                    mDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping inline-block';
+                    mTxt.innerText = '保存中...';
+                }
+            } else if (status === 'synced') {
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+                txt.innerText = 'クラウド保存: 同期済み';
+                if (mDot && mTxt) {
+                    mDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block';
+                    mTxt.innerText = '同期完了';
+                }
+            } else if (status === 'error') {
+                dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+                txt.innerText = 'クラウド保存: エラー';
+                if (mDot && mTxt) {
+                    mDot.className = 'w-1.5 h-1.5 rounded-full bg-rose-500 inline-block';
+                    mTxt.innerText = '同期エラー';
+                }
+            }
+        }
+
+        async function initCloudPersistence() {
+            if (typeof __firebase_config === 'undefined') {
+                console.log("No firebase configuration in environment; running in session mode.");
+                updateSyncBadge('synced');
+                return;
+            }
+
+            try {
+                updateSyncBadge('syncing');
+                const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
+                const { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
+                const { getFirestore, doc, setDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js');
+
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+
+                // RULE 3: Authenticate FIRST before queries
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (!user) return;
+
+                    // RULE 1: Strict collection path /artifacts/{appId}/public/data/{collectionName}
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sales_management_data', 'main_state');
+
+                    // RULE 2: Single document listener (No complex queries) with mandatory error callback
+                    onSnapshot(docRef, (docSnap) => {
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            if (data && data.weeks) {
+                                appState.masterReps = data.masterReps || appState.masterReps;
+                                appState.weeks = data.weeks || appState.weeks;
+                                if (data.currentWeekMondayStr && appState.weeks[data.currentWeekMondayStr]) {
+                                    appState.currentWeekMondayStr = data.currentWeekMondayStr;
+                                }
+                                renderAll();
+                            }
+                        } else {
+                            // First initialization: save initial state
+                            setDoc(docRef, {
+                                masterReps: appState.masterReps,
+                                currentWeekMondayStr: appState.currentWeekMondayStr,
+                                weeks: appState.weeks,
+                                updatedAt: new Date().toISOString()
+                            }).catch(err => console.error("Initial doc creation error:", err));
+                        }
+                        updateSyncBadge('synced');
+                    }, (err) => {
+                        console.error("Firestore snapshot error:", err);
+                        updateSyncBadge('error');
+                    });
+
+                    // Define internal cloud save function
+                    window._persistAppStateToCloud = async function() {
+                        if (!auth.currentUser) return;
+                        updateSyncBadge('syncing');
+                        try {
+                            await setDoc(docRef, {
+                                masterReps: appState.masterReps,
+                                currentWeekMondayStr: appState.currentWeekMondayStr,
+                                weeks: appState.weeks,
+                                updatedAt: new Date().toISOString()
+                            });
+                            updateSyncBadge('synced');
+                        } catch (e) {
+                            console.error("Failed to persist data to cloud:", e);
+                            updateSyncBadge('error');
+                        }
+                    };
+                });
+            } catch (err) {
+                console.error("Cloud persistence init error:", err);
+                updateSyncBadge('error');
+            }
+        }
+
+        function triggerCloudSave() {
+            if (typeof window._persistAppStateToCloud === 'function') {
+                if (cloudSaveDebounceTimer) clearTimeout(cloudSaveDebounceTimer);
+                cloudSaveDebounceTimer = setTimeout(() => {
+                    window._persistAppStateToCloud();
+                }, 300);
+            }
+        }
+
         window.onload = function() {
             renderRepDropdowns();
             renderAll();
             switchView('table');
+            initCloudPersistence();
         };
 
         function toggleMobileSidebar(forceState) {
@@ -1201,6 +1340,7 @@
             input.value = '';
             renderRepManageList();
             renderRepDropdowns();
+            triggerCloudSave();
             showToast(`担当者「${name}」を追加しました`);
         }
 
@@ -1227,6 +1367,7 @@
             renderRepManageList();
             renderRepDropdowns();
             renderAll();
+            triggerCloudSave();
             showToast(`担当者名を「${trimmedNew}」に更新しました`);
         }
 
@@ -1240,6 +1381,7 @@
             renderRepManageList();
             renderRepDropdowns();
             renderAll();
+            triggerCloudSave();
             showToast(`担当者「${repName}」を削除しました`);
         }
 
@@ -1393,6 +1535,7 @@
             closeRestoreModal();
             renderRepDropdowns();
             renderAll();
+            triggerCloudSave();
             showToast('データを正常に復元しました');
         }
 
@@ -1443,11 +1586,13 @@
 
             appState.currentWeekMondayStr = targetMonStr;
             renderAll();
+            triggerCloudSave();
         }
 
         function onWeekDropdownChange(val) {
             appState.currentWeekMondayStr = val;
             renderAll();
+            triggerCloudSave();
         }
 
         function jumpToCurrentWeek() {
@@ -1460,6 +1605,7 @@
             }
             appState.currentWeekMondayStr = todayMonStr;
             renderAll();
+            triggerCloudSave();
         }
 
         function getCurrentRecords() {
@@ -1689,7 +1835,6 @@
 
                 const rankBadge = getRankBadge(r.status);
 
-                // Concerns badge / indicator in table
                 let concernsBlock = '';
                 if (r.concerns && r.concerns.trim().length > 0) {
                     concernsBlock = `
@@ -1816,6 +1961,7 @@
 
             closeRecordModal();
             renderAll();
+            triggerCloudSave();
         }
 
         function deleteRecord(id) {
@@ -1824,6 +1970,7 @@
             if (index !== -1) {
                 records.splice(index, 1);
                 renderAll();
+                triggerCloudSave();
             }
         }
 
@@ -1872,6 +2019,7 @@
             appState.currentWeekMondayStr = monStr;
             closeNewWeekModal();
             renderAll();
+            triggerCloudSave();
         }
 
         function renderAnalytics() {
