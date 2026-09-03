@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for summary visual analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (xlsx) for Excel export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Google Fonts: Plus Jakarta Sans, Noto Sans JP, Playfair Display (for C.P.O Logo) -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
@@ -166,8 +168,14 @@
         <!-- Sidebar Bottom / Utilities & C.P.O Logo (White on Dark Navy) -->
         <div class="p-4 border-t border-solid-800 bg-solid-950 space-y-2.5">
             <div class="px-1 text-[10px] uppercase font-bold tracking-wider text-solid-500">
-                データ管理 (フォルダ選択)
+                データ管理・出力
             </div>
+
+            <!-- Export to Excel Button in Sidebar -->
+            <button onclick="exportHistoryToExcel(); toggleMobileSidebar(false);" class="w-full flex items-center space-x-2 px-3 py-2 bg-emerald-950/80 hover:bg-emerald-600 text-emerald-200 hover:text-white rounded text-xs font-semibold border border-emerald-800 hover:border-emerald-600 transition-colors group">
+                <i class="fa-solid fa-file-excel text-emerald-400 group-hover:text-white text-xs w-4 text-center"></i>
+                <span>全履歴をExcel出力</span>
+            </button>
 
             <!-- Save Data Button -->
             <button onclick="saveDataToFile()" class="w-full flex items-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-brand-500 text-white rounded text-xs font-semibold border border-solid-800 hover:border-brand-500 transition-colors group">
@@ -221,7 +229,7 @@
                         </div>
                         <div>
                             <h2 class="text-sm font-bold text-solid-900 uppercase tracking-wide">担当者別 営業行動管理表</h2>
-                            <p class="text-xs text-solid-500 mt-0.5">各営業担当者の進行案件、受注計上金額、行動内容、および次回アクションを管理・更新できます。</p>
+                            <p class="text-xs text-solid-500 mt-0.5">各営業担当者の進行案件、受注計上金額、行動内容、懸念問題事項、および次回アクションを管理・更新できます。</p>
                         </div>
                     </div>
                     
@@ -319,7 +327,7 @@
 
                     <!-- Search Input -->
                     <div class="relative w-full sm:w-60">
-                        <input type="text" id="filterSearch" oninput="renderTable()" placeholder="案件名・内容・担当者を検索..." class="w-full bg-white border border-solid-300 text-solid-800 text-xs rounded pl-7 pr-2.5 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        <input type="text" id="filterSearch" oninput="renderTable()" placeholder="案件名・内容・懸念・担当者を検索..." class="w-full bg-white border border-solid-300 text-solid-800 text-xs rounded pl-7 pr-2.5 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
                         <i class="fa-solid fa-magnifying-glass absolute left-2 top-2 text-solid-400 text-xs"></i>
                     </div>
                 </div>
@@ -327,7 +335,7 @@
                 <!-- Sales Activity Table Container -->
                 <div class="solid-card rounded-lg overflow-hidden">
                     <div class="overflow-x-auto custom-scrollbar">
-                        <table class="w-full text-left border-collapse min-w-[900px]">
+                        <table class="w-full text-left border-collapse min-w-[950px]">
                             <thead>
                                 <tr class="bg-solid-100 border-b border-solid-200 text-[11px] uppercase tracking-wider text-solid-600 font-bold">
                                     <!-- Clickable Sortable TH: Rank -->
@@ -361,7 +369,7 @@
                                     <!-- Clickable Sortable TH: Detail -->
                                     <th class="py-3 px-3 sortable-th" onclick="toggleSort('detail')" title="クリックで内容順に並び替え">
                                         <div class="flex items-center justify-between">
-                                            <span>内容 (今週の行動・次回アクション)</span>
+                                            <span>内容 (今週の行動・懸念事項・次回アクション)</span>
                                             <span id="sortIconDetail" class="text-solid-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
                                         </div>
                                     </th>
@@ -530,7 +538,55 @@
                     </div>
                 </div>
 
-                <!-- Weekly Sales Rep Revenue Breakdown (Row 2) -->
+                <!-- NEW: Weekly Concerns & Problem Issues with Gemini AI Summary (Row 2) -->
+                <div class="solid-card p-4 rounded-lg space-y-3 border-l-4 border-l-amber-500">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-solid-200 pb-2.5">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-7 h-7 rounded bg-amber-50 text-amber-700 border border-amber-300 flex items-center justify-center text-xs font-bold">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </span>
+                            <div>
+                                <h3 class="text-xs font-bold text-solid-900 uppercase tracking-wide flex items-center">
+                                    <span>今週の懸念・問題事項（各担当から抽出）</span>
+                                    <span id="concernCountBadge" class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">0件</span>
+                                </h3>
+                                <p class="text-[11px] text-solid-500">営業担当者から報告された懸念事項を抽出し、営業責任者向けにGemini AIが重要度・対策を箇条書きで要約します</p>
+                            </div>
+                        </div>
+
+                        <!-- Gemini AI Summary Trigger Button -->
+                        <button onclick="generateConcernsSummaryWithGemini()" id="aiSummaryBtn" class="px-3.5 py-1.5 bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-xs font-bold rounded border border-purple-800 shadow-xs transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-wand-magic-sparkles text-purple-200 text-xs"></i>
+                            <span>Geminiで要約・示唆を抽出</span>
+                        </button>
+                    </div>
+
+                    <!-- Gemini AI Summary Result Box (Initially hidden until generated or showing placeholder) -->
+                    <div id="aiSummaryResultWrapper" class="hidden p-3.5 bg-purple-50/70 border border-purple-200 rounded text-xs space-y-2">
+                        <div class="flex items-center justify-between text-purple-900 font-bold border-b border-purple-200 pb-1.5">
+                            <div class="flex items-center space-x-1.5">
+                                <i class="fa-solid fa-robot text-purple-600"></i>
+                                <span>Gemini AI による懸念・問題事項の要約と対応示唆</span>
+                            </div>
+                            <span class="text-[10px] text-purple-700 font-normal">Gemini 2.5 Flash</span>
+                        </div>
+                        <div id="aiSummaryContent" class="text-solid-800 leading-relaxed whitespace-pre-line text-xs font-medium pl-1">
+                            <!-- Dynamic AI Output -->
+                        </div>
+                    </div>
+
+                    <!-- Concerns List Extracted from Reps -->
+                    <div class="space-y-1.5 pt-1">
+                        <div class="text-[11px] font-bold text-solid-700 flex items-center justify-between">
+                            <span>各担当者の懸念・問題事項一覧</span>
+                        </div>
+                        <div id="concernsListContainer" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+                            <!-- Dynamic Concerns Items -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Sales Rep Revenue Breakdown (Row 3) -->
                 <div class="solid-card p-4 rounded-lg space-y-3">
                     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-solid-200 pb-2.5">
                         <div class="flex items-center space-x-2">
@@ -552,10 +608,10 @@
                 </div>
             </section>
 
-            <!-- VIEW 3: Historical Logs -->
+            <!-- VIEW 3: Historical Logs (With Excel Export Controls) -->
             <section id="historyView" class="hidden space-y-4">
                 <div class="solid-card p-4 rounded-lg space-y-3">
-                    <div class="flex items-center justify-between border-b border-solid-200 pb-3">
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-solid-200 pb-3">
                         <div class="flex items-center space-x-2.5">
                             <i class="fa-solid fa-timeline text-brand-500 text-sm"></i>
                             <div>
@@ -563,11 +619,18 @@
                                 <p class="text-[11px] text-solid-500">保存されている過去週の行動ログおよび進捗の履歴一覧です</p>
                             </div>
                         </div>
-                        <span id="historyTotalCount" class="bg-solid-100 border border-solid-300 text-solid-700 px-2.5 py-0.5 rounded text-xs font-bold">全 0 週分</span>
+                        <div class="flex items-center space-x-2">
+                            <!-- Excel Export All Button -->
+                            <button onclick="exportHistoryToExcel()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded border border-emerald-700 shadow-xs transition-colors flex items-center space-x-1.5" title="全週の履歴をエクセル形式(.xlsx)で一括ダウンロード">
+                                <i class="fa-solid fa-file-excel text-xs"></i>
+                                <span>Excel形式で全履歴を出力 (.xlsx)</span>
+                            </button>
+                            <span id="historyTotalCount" class="bg-solid-100 border border-solid-300 text-solid-700 px-2.5 py-1 rounded text-xs font-bold">全 0 週分</span>
+                        </div>
                     </div>
 
                     <div id="historyListContainer" class="space-y-3 pt-1">
-                        <!-- Dynamic History Cards -->
+                        <!-- Dynamic History Cards with single-week Excel Export option -->
                     </div>
                 </div>
             </section>
@@ -576,7 +639,7 @@
     </div>
 
 
-    <!-- MODAL: Add / Edit Record (Solid Modal with Rep Select Dropdown) -->
+    <!-- MODAL: Add / Edit Record (With Concerns Field) -->
     <div id="recordModal" class="fixed inset-0 bg-solid-950/70 z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-lg max-w-lg w-full shadow-lg border border-solid-300 overflow-hidden">
             <!-- Modal Header -->
@@ -667,8 +730,20 @@
 
                 <!-- Details / Actions -->
                 <div>
-                    <label class="block text-xs font-bold text-solid-700 mb-1">内容 (行動履歴・次回アクション) <span class="text-rose-600">*</span></label>
-                    <textarea id="modalDetail" rows="3" required placeholder="今週実施した行動や次回のアクション予定を記入してください。&#10;例: 提案書提示及び役員プレゼン完了。見込み価格の合意形成中。次回9/4役員会決議。" class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-brand-500 focus:border-brand-500"></textarea>
+                    <label class="block text-xs font-bold text-solid-700 mb-1">内容 (今週の行動・次回アクション) <span class="text-rose-600">*</span></label>
+                    <textarea id="modalDetail" rows="2" required placeholder="今週実施した行動や次回のアクション予定を記入してください。&#10;例: 提案書提示及び役員プレゼン完了。見込み価格の合意形成中。次回9/4役員会決議。" class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-brand-500 focus:border-brand-500"></textarea>
+                </div>
+
+                <!-- NEW: Concerns and Problem Issues Input -->
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-bold text-solid-700 flex items-center">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1.5 text-xs"></i>
+                            <span>懸念・問題事項</span>
+                        </label>
+                        <span class="text-[10px] text-solid-400 font-normal">任意 (週次分析でAI抽出・要約されます)</span>
+                    </div>
+                    <textarea id="modalConcerns" rows="2" placeholder="競合の動き、価格交渉での難航、先方社内稟議の停滞、納期懸念など、問題点やサポートが必要な事項があれば記入してください。" class="w-full bg-white border border-amber-300 focus:border-amber-500 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-amber-500"></textarea>
                 </div>
 
                 <!-- Form Actions -->
@@ -700,7 +775,6 @@
 
             <!-- Content Area -->
             <div class="p-5 space-y-4 overflow-y-auto custom-scrollbar flex-1">
-                <!-- Add New Rep Form -->
                 <form onsubmit="handleAddNewRep(event)" class="space-y-2">
                     <label class="block text-xs font-bold text-solid-700">新規担当者の追加</label>
                     <div class="flex space-x-2">
@@ -711,7 +785,6 @@
                     </div>
                 </form>
 
-                <!-- Current Reps List -->
                 <div class="space-y-2 pt-2 border-t border-solid-200">
                     <div class="flex items-center justify-between text-xs font-bold text-solid-700">
                         <span>登録済み担当者一覧</span>
@@ -802,7 +875,6 @@
 
     <script>
         // --- DATA STRUCTURE & INITIAL STATE ---
-        // Initial requested 12 sales representatives
         const INITIAL_MASTER_REPS = [
             '村上', '澁井', '酒井', '齋藤', '髙木', '上石',
             '佐藤', '金子', '出水', '多田羅', '中村', '中山'
@@ -925,7 +997,6 @@
             switchView('table');
         };
 
-        // Mobile Sidebar Drawer Toggle
         function toggleMobileSidebar(forceState) {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('mobileBackdrop');
@@ -942,7 +1013,6 @@
             }
         }
 
-        // Toast Notification Helper
         function showToast(message, isError = false) {
             const toast = document.getElementById('toastNotification');
             const msgEl = document.getElementById('toastMessage');
@@ -964,14 +1034,216 @@
             }, 2500);
         }
 
+        // --- GEMINI API INTEGRATION FOR CONCERNS SUMMARY ---
+        // Empty apiKey as mandated by execution environment
+        const apiKey = "";
+
+        async function fetchWithExponentialBackoff(url, options, maxRetries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i <= maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return await response.json();
+                    }
+                    if (i === maxRetries) {
+                        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    }
+                } catch (err) {
+                    if (i === maxRetries) {
+                        throw err;
+                    }
+                }
+                await new Promise(res => setTimeout(res, delays[i]));
+            }
+        }
+
+        async function generateConcernsSummaryWithGemini() {
+            const records = getCurrentRecords();
+            const concernsItems = records.filter(r => r.concerns && r.concerns.trim().length > 0);
+
+            if (concernsItems.length === 0) {
+                showToast('今週登録されている懸念・問題事項がありません', true);
+                return;
+            }
+
+            const aiBtn = document.getElementById('aiSummaryBtn');
+            const resultWrapper = document.getElementById('aiSummaryResultWrapper');
+            const contentEl = document.getElementById('aiSummaryContent');
+
+            // Set Loading UI
+            const originalBtnHtml = aiBtn.innerHTML;
+            aiBtn.disabled = true;
+            aiBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-xs mr-1"></i><span>Gemini分析中...</span>`;
+
+            resultWrapper.classList.remove('hidden');
+            contentEl.innerHTML = `<div class="py-3 flex items-center space-x-2 text-purple-700">
+                <i class="fa-solid fa-spinner fa-spin text-sm"></i>
+                <span>各担当者の懸念事項を整理・分析しています...</span>
+            </div>`;
+
+            // Prepare prompt text
+            const info = getWeekInfo(appState.currentWeekMondayStr);
+            let inputReportText = `対象期間: ${info.title} (${info.range})\n\n報告された懸念・問題事項一覧:\n`;
+
+            concernsItems.forEach((r, idx) => {
+                inputReportText += `[${idx + 1}] 担当: ${r.rep} | 案件: ${r.title} (進捗: ${r.status})\n`;
+                inputReportText += `　懸念事項: ${r.concerns}\n`;
+                if (r.detail) {
+                    inputReportText += `　活動状況: ${r.detail}\n`;
+                }
+                inputReportText += `\n`;
+            });
+
+            const systemInstruction = `あなたは優秀な営業統括責任者のアドバイザーです。
+営業担当者たちから上がってきた今週の懸念・問題事項を精査し、以下の構成で簡潔かつ論理的に箇条書きでまとめてください。
+
+【構成】
+1. 今週の最優先・重要課題サマリー (2〜3点の箇条書き)
+2. 案件別・担当別の懸念ポイント要約 (各案件ごとの端的な整理)
+3. 営業責任者として即時取るべき指示・アクション指針 (フォローや介入のアドバイス)
+
+文章は過度な修飾を避け、ビジネス現場で即断即決できるソリッドで明快な日本語で出力してください。`;
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: inputReportText }]
+                }],
+                systemInstruction: {
+                    parts: [{ text: systemInstruction }]
+                }
+            };
+
+            const endpointUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            try {
+                const result = await fetchWithExponentialBackoff(endpointUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const replyText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (replyText) {
+                    contentEl.innerText = replyText;
+                    showToast('Geminiによる要約を生成しました');
+                } else {
+                    throw new Error('応答テキストの取得に失敗しました');
+                }
+            } catch (error) {
+                console.error('Gemini API Error:', error);
+                contentEl.innerHTML = `<span class="text-rose-600"><i class="fa-solid fa-circle-exclamation mr-1"></i>要約の生成に失敗しました。しばらく時間を置いて再度お試しください。</span>`;
+                showToast('要約の生成に失敗しました', true);
+            } finally {
+                aiBtn.disabled = false;
+                aiBtn.innerHTML = originalBtnHtml;
+            }
+        }
+
+        // --- EXCEL (.XLSX) EXPORT FUNCTIONALITY ---
+        function exportHistoryToExcel(targetWeekStr = null) {
+            try {
+                const now = new Date();
+                const y = now.getFullYear();
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const d = String(now.getDate()).padStart(2, '0');
+
+                let weekKeysToExport = [];
+                let fileName = '';
+
+                if (targetWeekStr && appState.weeks[targetWeekStr]) {
+                    weekKeysToExport = [targetWeekStr];
+                    const info = getWeekInfo(targetWeekStr);
+                    fileName = `営業活動履歴_${info.title.replace(/\s+/g, '')}_${y}${m}${d}.xlsx`;
+                } else {
+                    weekKeysToExport = Object.keys(appState.weeks).sort().reverse();
+                    fileName = `営業活動履歴_全履歴_${y}${m}${d}.xlsx`;
+                }
+
+                if (weekKeysToExport.length === 0) {
+                    showToast('エクスポートするデータがありません', true);
+                    return;
+                }
+
+                // Construct Header including Concerns column
+                const sheetData = [
+                    ['週', '期間', 'ランク', '担当者', '案件名', '受注計上金額(円)', '計上月', 'ステータス', '内容 (行動履歴・次回アクション)', '懸念・問題事項']
+                ];
+
+                let totalRecordCount = 0;
+
+                weekKeysToExport.forEach(wKey => {
+                    const weekObj = appState.weeks[wKey];
+                    const info = getWeekInfo(wKey);
+
+                    if (!weekObj || !weekObj.records || weekObj.records.length === 0) {
+                        sheetData.push([
+                            info.title,
+                            info.range,
+                            '-',
+                            '-',
+                            '(登録なし)',
+                            0,
+                            '-',
+                            '-',
+                            '-',
+                            '-'
+                        ]);
+                        return;
+                    }
+
+                    weekObj.records.forEach(r => {
+                        const rankObj = getRankBadge(r.status);
+                        const amt = Number(r.amount) || 0;
+                        sheetData.push([
+                            info.title,
+                            info.range,
+                            rankObj.rank,
+                            r.rep || '',
+                            r.title || '',
+                            amt,
+                            r.month || '',
+                            r.status || '',
+                            r.detail || '',
+                            r.concerns || ''
+                        ]);
+                        totalRecordCount++;
+                    });
+                });
+
+                const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+                ws['!cols'] = [
+                    { wch: 18 }, // 週
+                    { wch: 30 }, // 期間
+                    { wch: 8 },  // ランク
+                    { wch: 14 }, // 担当者
+                    { wch: 28 }, // 案件名
+                    { wch: 18 }, // 受注計上金額(円)
+                    { wch: 10 }, // 計上月
+                    { wch: 14 }, // ステータス
+                    { wch: 50 }, // 内容
+                    { wch: 40 }  // 懸念・問題事項
+                ];
+
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, '営業活動履歴');
+
+                XLSX.writeFile(wb, fileName);
+                showToast(`Excelファイルを出力しました (${fileName})`);
+            } catch (err) {
+                console.error('Excel export error:', err);
+                showToast('Excel形式のエクスポートに失敗しました', true);
+            }
+        }
+
         // --- SALES REP MASTER MANAGEMENT ---
         function renderRepDropdowns() {
-            // 1. Filter Dropdown in Table View
             const filterSelect = document.getElementById('filterRep');
             const currentFilterVal = filterSelect.value;
             filterSelect.innerHTML = '<option value="ALL">全員表示</option>';
 
-            // Combine master reps with any existing records' reps to avoid orphan data
             const allAvailableRepsSet = new Set(appState.masterReps);
             Object.values(appState.weeks).forEach(week => {
                 (week.records || []).forEach(r => {
@@ -989,7 +1261,6 @@
                 filterSelect.value = currentFilterVal;
             }
 
-            // 2. Action Registration/Edit Modal Dropdown
             const modalSelect = document.getElementById('modalRep');
             const currentModalVal = modalSelect.value;
             modalSelect.innerHTML = '<option value="">担当者を選択してください</option>';
@@ -1078,7 +1349,6 @@
 
             appState.masterReps[index] = trimmedNew;
 
-            // Update in all existing records as well
             Object.values(appState.weeks).forEach(w => {
                 (w.records || []).forEach(r => {
                     if (r.rep === oldName) r.rep = trimmedNew;
@@ -1104,7 +1374,7 @@
             showToast(`担当者「${repName}」を削除しました`);
         }
 
-        // --- FILE SAVE / RESTORE IMPLEMENTATION ---
+        // --- FILE SAVE / RESTORE IMPLEMENTATION (JSON Backup) ---
         async function saveDataToFile() {
             const now = new Date();
             const y = now.getFullYear();
@@ -1135,9 +1405,7 @@
                     showToast('選択した保存先にデータを保存しました');
                     return;
                 } catch (err) {
-                    if (err.name === 'AbortError') {
-                        return;
-                    }
+                    if (err.name === 'AbortError') return;
                     console.warn('showSaveFilePicker failed, falling back to download:', err);
                 }
             }
@@ -1175,9 +1443,7 @@
                     parseAndConfirmRestore(text);
                     return;
                 } catch (err) {
-                    if (err.name === 'AbortError') {
-                        return;
-                    }
+                    if (err.name === 'AbortError') return;
                     console.warn('showOpenFilePicker failed, falling back to file input:', err);
                 }
             }
@@ -1427,9 +1693,7 @@
             const val = `${appState.sortKey}_${appState.sortDirection}`;
             if (select) {
                 select.value = val;
-                if (!select.value) {
-                    select.value = 'default_asc';
-                }
+                if (!select.value) select.value = 'default_asc';
             }
             updateSortHeaderIcons();
         }
@@ -1478,11 +1742,12 @@
                 if (filterSearch) {
                     const matchTitle = (r.title || '').toLowerCase().includes(filterSearch);
                     const matchDetail = (r.detail || '').toLowerCase().includes(filterSearch);
+                    const matchConcerns = (r.concerns || '').toLowerCase().includes(filterSearch);
                     const matchRep = (r.rep || '').toLowerCase().includes(filterSearch);
                     const matchMonth = (r.month || '').toLowerCase().includes(filterSearch);
                     const rankObj = getRankBadge(r.status);
                     const matchRank = rankObj.rank.toLowerCase().includes(filterSearch);
-                    if (!matchTitle && !matchDetail && !matchRep && !matchMonth && !matchRank) return false;
+                    if (!matchTitle && !matchDetail && !matchConcerns && !matchRep && !matchMonth && !matchRank) return false;
                 }
                 return true;
             });
@@ -1555,9 +1820,22 @@
 
                 const rankBadge = getRankBadge(r.status);
 
+                // Concerns badge / indicator in table
+                let concernsBlock = '';
+                if (r.concerns && r.concerns.trim().length > 0) {
+                    concernsBlock = `
+                        <div class="mt-1.5 p-1.5 rounded bg-amber-50/90 border border-amber-200 text-[11px] text-amber-900 flex items-start space-x-1.5">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-600 text-[10px] mt-0.5 shrink-0"></i>
+                            <div class="leading-tight">
+                                <span class="font-bold text-amber-950">懸念事項:</span>
+                                <span>${r.concerns}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
                 html += `
                     <tr class="hover:bg-solid-50 transition-colors">
-                        <!-- Rank Column -->
                         <td class="py-2.5 px-3 text-center">
                             <div class="flex justify-center items-center">
                                 <span class="w-6 h-6 rounded ${rankBadge.bgClass} border flex items-center justify-center text-[11px] font-black tracking-tight" title="${rankBadge.title}">
@@ -1565,19 +1843,16 @@
                                 </span>
                             </div>
                         </td>
-                        <!-- Rep Column -->
                         <td class="py-2.5 px-3 font-semibold text-solid-900 whitespace-nowrap">
                             ${r.rep}
                         </td>
-                        <!-- Title Column -->
                         <td class="py-2.5 px-3 font-semibold text-solid-900">${r.title}</td>
-                        <!-- Amount Column -->
                         <td class="py-2.5 px-3 text-xs">${amountDisplay}</td>
-                        <!-- Detail Column -->
-                        <td class="py-2.5 px-3 text-solid-600 leading-relaxed whitespace-pre-line text-xs">${r.detail}</td>
-                        <!-- Status Column -->
+                        <td class="py-2.5 px-3 text-solid-600 leading-relaxed text-xs">
+                            <div class="whitespace-pre-line">${r.detail}</div>
+                            ${concernsBlock}
+                        </td>
                         <td class="py-2.5 px-3">${getStatusBadgeHTML(r.status)}</td>
-                        <!-- Action Column -->
                         <td class="py-2.5 px-3 text-center">
                             <div class="flex items-center justify-center space-x-1.5 text-solid-400">
                                 <button onclick="openRecordModal('${r.id}')" class="p-1 hover:text-brand-500 hover:bg-solid-100 rounded transition-colors" title="編集">
@@ -1614,12 +1889,14 @@
                     document.getElementById('modalMonth').value = record.month || '';
                     document.getElementById('modalStatus').value = record.status || 'アプローチ中';
                     document.getElementById('modalDetail').value = record.detail || '';
+                    document.getElementById('modalConcerns').value = record.concerns || '';
                     titleEl.innerText = '案件・行動の編集';
                 }
             } else {
                 document.getElementById('recordId').value = '';
                 document.getElementById('modalAmount').value = '';
                 document.getElementById('modalMonth').value = '';
+                document.getElementById('modalConcerns').value = '';
                 titleEl.innerText = '案件・行動の追加';
             }
 
@@ -1640,6 +1917,7 @@
             const month = amount > 0 ? document.getElementById('modalMonth').value : '';
             const status = document.getElementById('modalStatus').value;
             const detail = document.getElementById('modalDetail').value.trim();
+            const concerns = document.getElementById('modalConcerns').value.trim();
 
             if (!rep) {
                 showToast('担当者を選択してください', true);
@@ -1651,7 +1929,7 @@
             if (recordId) {
                 const index = records.findIndex(r => r.id === recordId);
                 if (index !== -1) {
-                    records[index] = { id: recordId, rep, title, amount, month, status, detail };
+                    records[index] = { id: recordId, rep, title, amount, month, status, detail, concerns };
                 }
             } else {
                 const newRecord = {
@@ -1661,7 +1939,8 @@
                     amount,
                     month,
                     status,
-                    detail
+                    detail,
+                    concerns
                 };
                 records.push(newRecord);
             }
@@ -1715,7 +1994,8 @@
                         amount: r.amount || 0,
                         month: r.month || '',
                         status: r.status,
-                        detail: `[前週より引継ぎ] ${r.detail}`
+                        detail: `[前週より引継ぎ] ${r.detail}`,
+                        concerns: r.concerns || ''
                     });
                 });
             }
@@ -1784,7 +2064,6 @@
                     const m = r.month || '未指定';
                     monthMap[m] = (monthMap[m] || 0) + amt;
 
-                    // Group by Sales Rep
                     const repName = r.rep && r.rep.trim() ? r.rep.trim() : '担当者未設定';
                     if (!repRevenueMap[repName]) {
                         repRevenueMap[repName] = { total: 0, count: 0, items: [] };
@@ -1819,7 +2098,49 @@
                 `).join('');
             }
 
-            // 3. Render Sales Rep Revenue Breakdown (Grouped by Rep with aggregated amounts and counts)
+            // 3. Render Concerns & Problem Issues (Extracted from Reps)
+            const concernsContainer = document.getElementById('concernsListContainer');
+            const concernCountBadge = document.getElementById('concernCountBadge');
+            const reportedConcerns = records.filter(r => r.concerns && r.concerns.trim().length > 0);
+
+            concernCountBadge.innerText = `${reportedConcerns.length}件`;
+
+            // Reset AI wrapper if week changed
+            document.getElementById('aiSummaryResultWrapper').classList.add('hidden');
+            document.getElementById('aiSummaryContent').innerHTML = '';
+
+            if (reportedConcerns.length === 0) {
+                concernsContainer.innerHTML = `
+                    <div class="py-6 text-center text-solid-400 text-xs bg-solid-50 rounded border border-dashed border-solid-300">
+                        <i class="fa-regular fa-circle-check text-base text-emerald-500 mb-1"></i>
+                        <p>現在、担当者から報告された懸念・問題事項はありません。</p>
+                    </div>
+                `;
+            } else {
+                concernsContainer.innerHTML = reportedConcerns.map((r, i) => {
+                    const rank = getRankBadge(r.status);
+                    return `
+                        <div class="p-3 bg-white rounded border border-amber-200 shadow-xs space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2 overflow-hidden">
+                                    <span class="w-4 h-4 rounded-sm ${rank.bgClass} border flex items-center justify-center text-[9px] font-black">${rank.rank}</span>
+                                    <span class="font-bold text-solid-900 text-xs">${r.rep}</span>
+                                    <span class="text-solid-300">|</span>
+                                    <span class="font-semibold text-solid-800 text-xs truncate">${r.title}</span>
+                                </div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                                    ${r.status}
+                                </span>
+                            </div>
+                            <div class="text-xs text-amber-950 font-medium bg-amber-50/70 p-2 rounded border border-amber-100 whitespace-pre-line leading-relaxed">
+                                ${r.concerns}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 4. Render Sales Rep Revenue Breakdown (Grouped by Rep with aggregated amounts and counts)
             const repRevenueContainer = document.getElementById('repRevenueListContainer');
             const repSummaryBadge = document.getElementById('repRevenueSummaryBadge');
             const sortedRepKeys = Object.keys(repRevenueMap).sort((a, b) => repRevenueMap[b].total - repRevenueMap[a].total);
@@ -1838,7 +2159,6 @@
                     const repData = repRevenueMap[repName];
                     return `
                         <div class="bg-white p-3.5 rounded-lg border border-solid-200 shadow-xs space-y-2.5">
-                            <!-- Card Header -->
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-2 overflow-hidden">
                                     <div class="w-7 h-7 rounded bg-solid-800 text-white flex items-center justify-center font-bold text-xs shrink-0">
@@ -1854,7 +2174,6 @@
                                 </span>
                             </div>
 
-                            <!-- Aggregated Total Amount -->
                             <div class="bg-solid-50 p-2 rounded border border-solid-200">
                                 <div class="text-[10px] font-semibold text-solid-500">合計計上金額</div>
                                 <div class="text-base font-black text-brand-600 tracking-tight mt-0.5">
@@ -1862,7 +2181,6 @@
                                 </div>
                             </div>
 
-                            <!-- Items Breakdown List -->
                             <div class="space-y-1 pt-0.5">
                                 <div class="text-[10px] font-bold text-solid-600 flex items-center justify-between">
                                     <span>計上内訳</span>
@@ -1912,9 +2230,15 @@
                                 <span class="text-xs text-brand-600 font-medium">(${info.range})</span>
                                 ${isCurrent ? '<span class="bg-brand-500 text-white text-[9px] px-1.5 py-0.2 rounded font-bold">表示中</span>' : ''}
                             </div>
-                            <div class="flex items-center space-x-2.5">
+                            <div class="flex items-center space-x-2">
                                 <span class="text-xs text-solid-600">登録案件: <strong class="text-solid-900">${weekObj.records.length}</strong> 件</span>
                                 ${weekTotalAmt > 0 ? `<span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">計上総額: ¥${weekTotalAmt.toLocaleString()}</span>` : ''}
+                                
+                                <!-- Single Week Excel Export Button -->
+                                <button onclick="exportHistoryToExcel('${wKey}')" class="text-xs text-emerald-700 hover:text-white font-bold flex items-center bg-emerald-50 hover:bg-emerald-600 px-2 py-1 rounded border border-emerald-300 transition-colors" title="この週のデータをExcel形式で出力">
+                                    <i class="fa-solid fa-file-excel mr-1 text-[11px]"></i>Excel出力
+                                </button>
+                                
                                 <button onclick="onWeekDropdownChange('${wKey}'); switchView('analytics');" class="text-xs text-brand-500 hover:text-brand-600 font-bold flex items-center bg-solid-50 hover:bg-solid-100 px-2 py-1 rounded border border-solid-200 transition-colors">
                                     この週を表示 <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
                                 </button>
