@@ -148,6 +148,12 @@
                 <span class="flex-1">全履歴タイムライン</span>
             </button>
 
+            <!-- Action: Rep Management Button in Sidebar -->
+            <button onclick="openRepManageModal(); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left">
+                <i class="fa-solid fa-user-gear text-sm text-emerald-400 w-5 text-center"></i>
+                <span class="flex-1">担当者マスター登録</span>
+            </button>
+
             <!-- Action: New Week Creation -->
             <div class="pt-3 px-1">
                 <button onclick="openNewWeekModal(); toggleMobileSidebar(false);" class="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-solid-800 text-brand-300 hover:text-white rounded text-xs font-semibold border border-solid-800 transition-colors">
@@ -218,12 +224,21 @@
                             <p class="text-xs text-solid-500 mt-0.5">各営業担当者の進行案件、受注計上金額、行動内容、および次回アクションを管理・更新できます。</p>
                         </div>
                     </div>
-                    <!-- Legend for Rank Badges -->
-                    <div class="flex items-center space-x-3 text-xs bg-solid-50 px-3 py-1.5 rounded border border-solid-200">
-                        <span class="font-bold text-solid-600 mr-1"><i class="fa-solid fa-tags text-brand-500 mr-1"></i>ランク:</span>
-                        <span class="inline-flex items-center"><span class="w-4 h-4 rounded-sm bg-emerald-600 text-white font-bold text-[9px] flex items-center justify-center mr-1">A</span> 契約・完了</span>
-                        <span class="inline-flex items-center"><span class="w-4 h-4 rounded-sm bg-brand-500 text-white font-bold text-[9px] flex items-center justify-center mr-1">B</span> 受注見込</span>
-                        <span class="inline-flex items-center"><span class="w-4 h-4 rounded-sm bg-solid-200 text-solid-700 border border-solid-300 font-bold text-[9px] flex items-center justify-center mr-1">C</span> アプローチ～見積 / フォロー</span>
+                    
+                    <div class="flex flex-wrap items-center gap-2">
+                        <!-- Rep Master Management Trigger -->
+                        <button onclick="openRepManageModal()" class="px-3 py-1.5 bg-solid-100 hover:bg-solid-200 text-solid-800 text-xs font-bold rounded border border-solid-300 transition-colors flex items-center space-x-1.5">
+                            <i class="fa-solid fa-user-pen text-brand-500 text-xs"></i>
+                            <span>担当者の登録・編集</span>
+                        </button>
+
+                        <!-- Legend for Rank Badges -->
+                        <div class="flex items-center space-x-3 text-xs bg-solid-50 px-3 py-1.5 rounded border border-solid-200">
+                            <span class="font-bold text-solid-600 mr-1"><i class="fa-solid fa-tags text-brand-500 mr-1"></i>ランク:</span>
+                            <span class="inline-flex items-center"><span class="w-4 h-4 rounded-sm bg-emerald-600 text-white font-bold text-[9px] flex items-center justify-center mr-1">A</span> 契約・完了</span>
+                            <span class="inline-flex items-center"><span class="w-4 h-4 rounded-sm bg-brand-500 text-white font-bold text-[9px] flex items-center justify-center mr-1">B</span> 受注見込</span>
+                            <span class="inline-flex items-center"><span class="w-4 h-4 rounded-sm bg-solid-200 text-solid-700 border border-solid-300 font-bold text-[9px] flex items-center justify-center mr-1">C</span> アプローチ～見積 / フォロー</span>
+                        </div>
                     </div>
                 </div>
 
@@ -561,7 +576,7 @@
     </div>
 
 
-    <!-- MODAL: Add / Edit Record (Solid Modal) -->
+    <!-- MODAL: Add / Edit Record (Solid Modal with Rep Select Dropdown) -->
     <div id="recordModal" class="fixed inset-0 bg-solid-950/70 z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-lg max-w-lg w-full shadow-lg border border-solid-300 overflow-hidden">
             <!-- Modal Header -->
@@ -579,13 +594,18 @@
             <form id="recordForm" onsubmit="handleSaveRecord(event)" class="p-5 space-y-3.5">
                 <input type="hidden" id="recordId">
 
-                <!-- Rep Input with Autocomplete Datalist -->
+                <!-- Rep Select Dropdown -->
                 <div>
-                    <label class="block text-xs font-bold text-solid-700 mb-1">担当者名 <span class="text-rose-600">*</span></label>
-                    <input type="text" id="modalRep" list="repSuggestions" required placeholder="担当者名を入力（例: 山田 太郎）" class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-brand-500 focus:border-brand-500 font-medium">
-                    <datalist id="repSuggestions">
-                        <!-- Dynamic Rep Suggestions -->
-                    </datalist>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-bold text-solid-700">担当者名 <span class="text-rose-600">*</span></label>
+                        <button type="button" onclick="openRepManageModal()" class="text-[11px] text-brand-500 hover:text-brand-600 font-semibold underline">
+                            担当者の追加・編集
+                        </button>
+                    </div>
+                    <select id="modalRep" required class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-brand-500 focus:border-brand-500 font-medium">
+                        <option value="">担当者を選択してください</option>
+                        <!-- Dynamically filled with master reps -->
+                    </select>
                 </div>
 
                 <!-- Deal Name -->
@@ -664,6 +684,55 @@
         </div>
     </div>
 
+    <!-- MODAL: Manage Sales Reps (Master Registration/Edit) -->
+    <div id="repManageModal" class="fixed inset-0 bg-solid-950/70 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-lg max-w-md w-full shadow-lg border border-solid-300 overflow-hidden flex flex-col max-h-[90vh]">
+            <!-- Header -->
+            <div class="px-5 py-3.5 bg-solid-100 border-b border-solid-200 flex items-center justify-between shrink-0">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-user-gear text-brand-500 text-xs"></i>
+                    <h3 class="text-xs font-bold text-solid-900 uppercase tracking-wider">担当者マスター登録・編集</h3>
+                </div>
+                <button onclick="closeRepManageModal()" class="w-6 h-6 rounded hover:bg-solid-200 text-solid-500 hover:text-solid-800 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="p-5 space-y-4 overflow-y-auto custom-scrollbar flex-1">
+                <!-- Add New Rep Form -->
+                <form onsubmit="handleAddNewRep(event)" class="space-y-2">
+                    <label class="block text-xs font-bold text-solid-700">新規担当者の追加</label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="newRepInput" required placeholder="担当者名（例: 田中）" class="flex-1 bg-white border border-solid-300 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        <button type="submit" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded border border-brand-600 shadow-xs whitespace-nowrap">
+                            <i class="fa-solid fa-plus mr-1"></i>追加
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Current Reps List -->
+                <div class="space-y-2 pt-2 border-t border-solid-200">
+                    <div class="flex items-center justify-between text-xs font-bold text-solid-700">
+                        <span>登録済み担当者一覧</span>
+                        <span id="repManageCount" class="text-solid-500 font-normal text-[11px]">全 0 名</span>
+                    </div>
+
+                    <div id="repManageList" class="space-y-1.5 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+                        <!-- Dynamic Rep List Items with Edit & Delete -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 bg-solid-50 border-t border-solid-200 flex justify-end shrink-0">
+                <button type="button" onclick="closeRepManageModal()" class="px-4 py-2 bg-solid-800 hover:bg-solid-900 text-white text-xs font-bold rounded border border-solid-900">
+                    完了
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: Create New Week -->
     <div id="newWeekModal" class="fixed inset-0 bg-solid-950/70 z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-lg max-w-md w-full shadow-lg border border-solid-300 overflow-hidden">
@@ -733,6 +802,12 @@
 
     <script>
         // --- DATA STRUCTURE & INITIAL STATE ---
+        // Initial requested 12 sales representatives
+        const INITIAL_MASTER_REPS = [
+            '村上', '澁井', '酒井', '齋藤', '髙木', '上石',
+            '佐藤', '金子', '出水', '多田羅', '中村', '中山'
+        ];
+
         const STATUS_PIPELINE_ORDER = {
             'アプローチ中': 1,
             '提案・商談中': 2,
@@ -830,7 +905,7 @@
 
         let appState = {
             currentWeekMondayStr: initialMondayStr,
-            reps: [],
+            masterReps: [...INITIAL_MASTER_REPS],
             weeks: {
                 [initialMondayStr]: {
                     mondayStr: initialMondayStr,
@@ -845,7 +920,7 @@
         let statusChartInstance = null;
 
         window.onload = function() {
-            updateRepList();
+            renderRepDropdowns();
             renderAll();
             switchView('table');
         };
@@ -887,6 +962,146 @@
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-[-10px]', 'opacity-0', 'pointer-events-none');
             }, 2500);
+        }
+
+        // --- SALES REP MASTER MANAGEMENT ---
+        function renderRepDropdowns() {
+            // 1. Filter Dropdown in Table View
+            const filterSelect = document.getElementById('filterRep');
+            const currentFilterVal = filterSelect.value;
+            filterSelect.innerHTML = '<option value="ALL">全員表示</option>';
+
+            // Combine master reps with any existing records' reps to avoid orphan data
+            const allAvailableRepsSet = new Set(appState.masterReps);
+            Object.values(appState.weeks).forEach(week => {
+                (week.records || []).forEach(r => {
+                    if (r.rep && r.rep.trim()) allAvailableRepsSet.add(r.rep.trim());
+                });
+            });
+
+            const sortedReps = Array.from(allAvailableRepsSet).sort((a, b) => a.localeCompare(b, 'ja'));
+
+            sortedReps.forEach(rep => {
+                filterSelect.innerHTML += `<option value="${rep}">${rep}</option>`;
+            });
+
+            if (currentFilterVal && (currentFilterVal === 'ALL' || allAvailableRepsSet.has(currentFilterVal))) {
+                filterSelect.value = currentFilterVal;
+            }
+
+            // 2. Action Registration/Edit Modal Dropdown
+            const modalSelect = document.getElementById('modalRep');
+            const currentModalVal = modalSelect.value;
+            modalSelect.innerHTML = '<option value="">担当者を選択してください</option>';
+
+            appState.masterReps.forEach(rep => {
+                modalSelect.innerHTML += `<option value="${rep}">${rep}</option>`;
+            });
+
+            if (currentModalVal && appState.masterReps.includes(currentModalVal)) {
+                modalSelect.value = currentModalVal;
+            }
+        }
+
+        function openRepManageModal() {
+            renderRepManageList();
+            document.getElementById('newRepInput').value = '';
+            document.getElementById('repManageModal').classList.remove('hidden');
+        }
+
+        function closeRepManageModal() {
+            document.getElementById('repManageModal').classList.add('hidden');
+            renderRepDropdowns();
+            renderTable();
+        }
+
+        function renderRepManageList() {
+            const listEl = document.getElementById('repManageList');
+            const countEl = document.getElementById('repManageCount');
+            countEl.innerText = `全 ${appState.masterReps.length} 名`;
+
+            if (appState.masterReps.length === 0) {
+                listEl.innerHTML = '<p class="text-xs text-solid-400 py-3 text-center italic">登録されている担当者がいません</p>';
+                return;
+            }
+
+            listEl.innerHTML = appState.masterReps.map((rep, idx) => `
+                <div class="flex items-center justify-between p-2 rounded bg-solid-50 border border-solid-200 text-xs">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-5 h-5 rounded bg-solid-200 text-solid-700 font-bold text-[10px] flex items-center justify-center">
+                            ${idx + 1}
+                        </span>
+                        <span class="font-bold text-solid-900">${rep}</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button type="button" onclick="editRepName(${idx})" class="px-2 py-1 bg-white hover:bg-solid-100 text-solid-600 rounded border border-solid-300 text-[11px] font-semibold" title="名前を変更">
+                            編集
+                        </button>
+                        <button type="button" onclick="deleteRep(${idx})" class="px-2 py-1 bg-white hover:bg-rose-50 text-rose-600 rounded border border-solid-300 text-[11px] font-semibold" title="リストから削除">
+                            削除
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleAddNewRep(e) {
+            e.preventDefault();
+            const input = document.getElementById('newRepInput');
+            const name = input.value.trim();
+
+            if (!name) return;
+
+            if (appState.masterReps.includes(name)) {
+                showToast('既に同名の担当者が登録されています', true);
+                return;
+            }
+
+            appState.masterReps.push(name);
+            input.value = '';
+            renderRepManageList();
+            renderRepDropdowns();
+            showToast(`担当者「${name}」を追加しました`);
+        }
+
+        function editRepName(index) {
+            const oldName = appState.masterReps[index];
+            const newName = prompt(`担当者名を変更してください:`, oldName);
+
+            if (!newName || !newName.trim() || newName.trim() === oldName) return;
+
+            const trimmedNew = newName.trim();
+            if (appState.masterReps.includes(trimmedNew) && trimmedNew !== oldName) {
+                showToast('既に同名の担当者が存在します', true);
+                return;
+            }
+
+            appState.masterReps[index] = trimmedNew;
+
+            // Update in all existing records as well
+            Object.values(appState.weeks).forEach(w => {
+                (w.records || []).forEach(r => {
+                    if (r.rep === oldName) r.rep = trimmedNew;
+                });
+            });
+
+            renderRepManageList();
+            renderRepDropdowns();
+            renderAll();
+            showToast(`担当者名を「${trimmedNew}」に更新しました`);
+        }
+
+        function deleteRep(index) {
+            const repName = appState.masterReps[index];
+            if (!confirm(`担当者「${repName}」をリストから削除しますか？\n※既存の登録済み案件データは保持されます。`)) {
+                return;
+            }
+
+            appState.masterReps.splice(index, 1);
+            renderRepManageList();
+            renderRepDropdowns();
+            renderAll();
+            showToast(`担当者「${repName}」を削除しました`);
         }
 
         // --- FILE SAVE / RESTORE IMPLEMENTATION ---
@@ -1026,7 +1241,7 @@
 
             appState = {
                 currentWeekMondayStr: pendingRestoreData.currentWeekMondayStr || initialMondayStr,
-                reps: pendingRestoreData.reps || [],
+                masterReps: pendingRestoreData.masterReps || [...INITIAL_MASTER_REPS],
                 weeks: pendingRestoreData.weeks || {},
                 sortKey: 'default',
                 sortDirection: 'asc'
@@ -1041,43 +1256,13 @@
             }
 
             closeRestoreModal();
+            renderRepDropdowns();
             renderAll();
             showToast('データを正常に復元しました');
         }
 
-        // Extract reps dynamically from all weeks' records
-        function updateRepList() {
-            const repSet = new Set();
-            Object.values(appState.weeks).forEach(week => {
-                (week.records || []).forEach(r => {
-                    if (r.rep && r.rep.trim()) {
-                        repSet.add(r.rep.trim());
-                    }
-                });
-            });
-
-            appState.reps = Array.from(repSet).sort((a, b) => a.localeCompare(b, 'ja'));
-
-            // Populate Filter Select
-            const filterSelect = document.getElementById('filterRep');
-            const currentFilterVal = filterSelect.value;
-            filterSelect.innerHTML = '<option value="ALL">全員表示</option>';
-            appState.reps.forEach(rep => {
-                filterSelect.innerHTML += `<option value="${rep}">${rep}</option>`;
-            });
-            if (appState.reps.includes(currentFilterVal)) {
-                filterSelect.value = currentFilterVal;
-            }
-
-            // Populate Datalist suggestions for the modal
-            const datalist = document.getElementById('repSuggestions');
-            if (datalist) {
-                datalist.innerHTML = appState.reps.map(r => `<option value="${r}"></option>`).join('');
-            }
-        }
-
         function renderAll() {
-            updateRepList();
+            renderRepDropdowns();
             updateWeekHeaderAndDropdown();
             renderKPIs();
             renderTable();
@@ -1089,13 +1274,11 @@
             const currentMonStr = appState.currentWeekMondayStr;
             const info = getWeekInfo(currentMonStr);
 
-            // Update Analytics Header & Table Header
             document.getElementById('analyticsWeekTitle').innerText = info.title;
             document.getElementById('analyticsWeekRange').innerHTML = `<i class="fa-regular fa-calendar mr-1 opacity-80"></i><span>${info.range}</span>`;
             document.getElementById('tableWeekTitle').innerText = info.title;
             document.getElementById('tableWeekRange').innerHTML = `<i class="fa-regular fa-calendar mr-1 opacity-80"></i><span>${info.range}</span>`;
 
-            // Populate Week Selector Dropdowns
             const dropdown = document.getElementById('weekSelectDropdown');
             const tableDropdown = document.getElementById('tableWeekSelectDropdown');
             dropdown.innerHTML = '';
@@ -1418,18 +1601,19 @@
             const titleEl = document.getElementById('recordModalTitle');
 
             form.reset();
+            renderRepDropdowns();
 
             if (editId) {
                 const records = getCurrentRecords();
                 const record = records.find(r => r.id === editId);
                 if (record) {
                     document.getElementById('recordId').value = record.id;
-                    document.getElementById('modalRep').value = record.rep;
-                    document.getElementById('modalTitle').value = record.title;
+                    document.getElementById('modalRep').value = record.rep || '';
+                    document.getElementById('modalTitle').value = record.title || '';
                     document.getElementById('modalAmount').value = record.amount && record.amount > 0 ? record.amount : '';
                     document.getElementById('modalMonth').value = record.month || '';
-                    document.getElementById('modalStatus').value = record.status;
-                    document.getElementById('modalDetail').value = record.detail;
+                    document.getElementById('modalStatus').value = record.status || 'アプローチ中';
+                    document.getElementById('modalDetail').value = record.detail || '';
                     titleEl.innerText = '案件・行動の編集';
                 }
             } else {
@@ -1456,6 +1640,11 @@
             const month = amount > 0 ? document.getElementById('modalMonth').value : '';
             const status = document.getElementById('modalStatus').value;
             const detail = document.getElementById('modalDetail').value.trim();
+
+            if (!rep) {
+                showToast('担当者を選択してください', true);
+                return;
+            }
 
             const records = getCurrentRecords();
 
