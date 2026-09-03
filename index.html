@@ -349,35 +349,35 @@
                                     <th class="py-3 px-3 w-32 sortable-th" onclick="toggleSort('rep')" title="クリックで担当者あいうえお順に並び替え">
                                         <div class="flex items-center justify-between">
                                             <span>担当者</span>
-                                            <span id="sortIconRep" class="text-solid-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
+                                            <span id="sortIconRep" class="text-slate-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
                                         </div>
                                     </th>
                                     <!-- Clickable Sortable TH: Title -->
                                     <th class="py-3 px-3 w-44 sortable-th" onclick="toggleSort('title')" title="クリックで案件名順に並び替え">
                                         <div class="flex items-center justify-between">
                                             <span>案件名</span>
-                                            <span id="sortIconTitle" class="text-solid-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
+                                            <span id="sortIconTitle" class="text-slate-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
                                         </div>
                                     </th>
                                     <!-- Clickable Sortable TH: Amount -->
                                     <th class="py-3 px-3 w-32 sortable-th" onclick="toggleSort('amount')" title="クリックで受注計上金額順に並び替え">
                                         <div class="flex items-center justify-between">
                                             <span>受注計上金額</span>
-                                            <span id="sortIconAmount" class="text-solid-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
+                                            <span id="sortIconAmount" class="text-slate-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
                                         </div>
                                     </th>
                                     <!-- Clickable Sortable TH: Detail -->
                                     <th class="py-3 px-3 sortable-th" onclick="toggleSort('detail')" title="クリックで内容順に並び替え">
                                         <div class="flex items-center justify-between">
                                             <span>内容 (今週の行動・懸念事項・次回アクション)</span>
-                                            <span id="sortIconDetail" class="text-solid-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
+                                            <span id="sortIconDetail" class="text-slate-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
                                         </div>
                                     </th>
                                     <!-- Clickable Sortable TH: Status -->
                                     <th class="py-3 px-3 w-32 sortable-th" onclick="toggleSort('status')" title="クリックでステータス進捗順に並び替え">
                                         <div class="flex items-center justify-between">
                                             <span>ステータス</span>
-                                            <span id="sortIconStatus" class="text-solid-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
+                                            <span id="sortIconStatus" class="text-slate-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
                                         </div>
                                     </th>
                                     <th class="py-3 px-3 w-14 text-center">操作</th>
@@ -538,7 +538,7 @@
                     </div>
                 </div>
 
-                <!-- NEW: Weekly Concerns & Problem Issues with Gemini AI Summary (Row 2) -->
+                <!-- Weekly Concerns & Problem Issues (Extracted from Reps, AI removed) -->
                 <div class="solid-card p-4 rounded-lg space-y-3 border-l-4 border-l-amber-500">
                     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-solid-200 pb-2.5">
                         <div class="flex items-center space-x-2">
@@ -550,36 +550,13 @@
                                     <span>今週の懸念・問題事項（各担当から抽出）</span>
                                     <span id="concernCountBadge" class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">0件</span>
                                 </h3>
-                                <p class="text-[11px] text-solid-500">営業担当者から報告された懸念事項を抽出し、営業責任者向けにGemini AIが重要度・対策を箇条書きで要約します</p>
+                                <p class="text-[11px] text-solid-500">各営業担当者から報告された懸念点・課題事項を一覧で確認できます</p>
                             </div>
-                        </div>
-
-                        <!-- Gemini AI Summary Trigger Button -->
-                        <button onclick="generateConcernsSummaryWithGemini()" id="aiSummaryBtn" class="px-3.5 py-1.5 bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white text-xs font-bold rounded border border-purple-800 shadow-xs transition flex items-center space-x-1.5">
-                            <i class="fa-solid fa-wand-magic-sparkles text-purple-200 text-xs"></i>
-                            <span>Geminiで要約・示唆を抽出</span>
-                        </button>
-                    </div>
-
-                    <!-- Gemini AI Summary Result Box (Initially hidden until generated or showing placeholder) -->
-                    <div id="aiSummaryResultWrapper" class="hidden p-3.5 bg-purple-50/70 border border-purple-200 rounded text-xs space-y-2">
-                        <div class="flex items-center justify-between text-purple-900 font-bold border-b border-purple-200 pb-1.5">
-                            <div class="flex items-center space-x-1.5">
-                                <i class="fa-solid fa-robot text-purple-600"></i>
-                                <span>Gemini AI による懸念・問題事項の要約と対応示唆</span>
-                            </div>
-                            <span class="text-[10px] text-purple-700 font-normal">Gemini 2.5 Flash</span>
-                        </div>
-                        <div id="aiSummaryContent" class="text-solid-800 leading-relaxed whitespace-pre-line text-xs font-medium pl-1">
-                            <!-- Dynamic AI Output -->
                         </div>
                     </div>
 
                     <!-- Concerns List Extracted from Reps -->
                     <div class="space-y-1.5 pt-1">
-                        <div class="text-[11px] font-bold text-solid-700 flex items-center justify-between">
-                            <span>各担当者の懸念・問題事項一覧</span>
-                        </div>
                         <div id="concernsListContainer" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-1">
                             <!-- Dynamic Concerns Items -->
                         </div>
@@ -734,14 +711,14 @@
                     <textarea id="modalDetail" rows="2" required placeholder="今週実施した行動や次回のアクション予定を記入してください。&#10;例: 提案書提示及び役員プレゼン完了。見込み価格の合意形成中。次回9/4役員会決議。" class="w-full bg-white border border-solid-300 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-brand-500 focus:border-brand-500"></textarea>
                 </div>
 
-                <!-- NEW: Concerns and Problem Issues Input -->
+                <!-- Concerns and Problem Issues Input -->
                 <div>
                     <div class="flex items-center justify-between mb-1">
                         <label class="block text-xs font-bold text-solid-700 flex items-center">
                             <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1.5 text-xs"></i>
                             <span>懸念・問題事項</span>
                         </label>
-                        <span class="text-[10px] text-solid-400 font-normal">任意 (週次分析でAI抽出・要約されます)</span>
+                        <span class="text-[10px] text-solid-400 font-normal">任意 (週次分析で抽出・集約されます)</span>
                     </div>
                     <textarea id="modalConcerns" rows="2" placeholder="競合の動き、価格交渉での難航、先方社内稟議の停滞、納期懸念など、問題点やサポートが必要な事項があれば記入してください。" class="w-full bg-white border border-amber-300 focus:border-amber-500 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-amber-500"></textarea>
                 </div>
@@ -1034,113 +1011,6 @@
             }, 2500);
         }
 
-        // --- GEMINI API INTEGRATION FOR CONCERNS SUMMARY ---
-        // Empty apiKey as mandated by execution environment
-        const apiKey = "";
-
-        async function fetchWithExponentialBackoff(url, options, maxRetries = 5) {
-            const delays = [1000, 2000, 4000, 8000, 16000];
-            for (let i = 0; i <= maxRetries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.ok) {
-                        return await response.json();
-                    }
-                    if (i === maxRetries) {
-                        throw new Error(`API Error: ${response.status} ${response.statusText}`);
-                    }
-                } catch (err) {
-                    if (i === maxRetries) {
-                        throw err;
-                    }
-                }
-                await new Promise(res => setTimeout(res, delays[i]));
-            }
-        }
-
-        async function generateConcernsSummaryWithGemini() {
-            const records = getCurrentRecords();
-            const concernsItems = records.filter(r => r.concerns && r.concerns.trim().length > 0);
-
-            if (concernsItems.length === 0) {
-                showToast('今週登録されている懸念・問題事項がありません', true);
-                return;
-            }
-
-            const aiBtn = document.getElementById('aiSummaryBtn');
-            const resultWrapper = document.getElementById('aiSummaryResultWrapper');
-            const contentEl = document.getElementById('aiSummaryContent');
-
-            // Set Loading UI
-            const originalBtnHtml = aiBtn.innerHTML;
-            aiBtn.disabled = true;
-            aiBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-xs mr-1"></i><span>Gemini分析中...</span>`;
-
-            resultWrapper.classList.remove('hidden');
-            contentEl.innerHTML = `<div class="py-3 flex items-center space-x-2 text-purple-700">
-                <i class="fa-solid fa-spinner fa-spin text-sm"></i>
-                <span>各担当者の懸念事項を整理・分析しています...</span>
-            </div>`;
-
-            // Prepare prompt text
-            const info = getWeekInfo(appState.currentWeekMondayStr);
-            let inputReportText = `対象期間: ${info.title} (${info.range})\n\n報告された懸念・問題事項一覧:\n`;
-
-            concernsItems.forEach((r, idx) => {
-                inputReportText += `[${idx + 1}] 担当: ${r.rep} | 案件: ${r.title} (進捗: ${r.status})\n`;
-                inputReportText += `　懸念事項: ${r.concerns}\n`;
-                if (r.detail) {
-                    inputReportText += `　活動状況: ${r.detail}\n`;
-                }
-                inputReportText += `\n`;
-            });
-
-            const systemInstruction = `あなたは優秀な営業統括責任者のアドバイザーです。
-営業担当者たちから上がってきた今週の懸念・問題事項を精査し、以下の構成で簡潔かつ論理的に箇条書きでまとめてください。
-
-【構成】
-1. 今週の最優先・重要課題サマリー (2〜3点の箇条書き)
-2. 案件別・担当別の懸念ポイント要約 (各案件ごとの端的な整理)
-3. 営業責任者として即時取るべき指示・アクション指針 (フォローや介入のアドバイス)
-
-文章は過度な修飾を避け、ビジネス現場で即断即決できるソリッドで明快な日本語で出力してください。`;
-
-            const payload = {
-                contents: [{
-                    parts: [{ text: inputReportText }]
-                }],
-                systemInstruction: {
-                    parts: [{ text: systemInstruction }]
-                }
-            };
-
-            const endpointUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
-            try {
-                const result = await fetchWithExponentialBackoff(endpointUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const replyText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                if (replyText) {
-                    contentEl.innerText = replyText;
-                    showToast('Geminiによる要約を生成しました');
-                } else {
-                    throw new Error('応答テキストの取得に失敗しました');
-                }
-            } catch (error) {
-                console.error('Gemini API Error:', error);
-                contentEl.innerHTML = `<span class="text-rose-600"><i class="fa-solid fa-circle-exclamation mr-1"></i>要約の生成に失敗しました。しばらく時間を置いて再度お試しください。</span>`;
-                showToast('要約の生成に失敗しました', true);
-            } finally {
-                aiBtn.disabled = false;
-                aiBtn.innerHTML = originalBtnHtml;
-            }
-        }
-
         // --- EXCEL (.XLSX) EXPORT FUNCTIONALITY ---
         function exportHistoryToExcel(targetWeekStr = null) {
             try {
@@ -1166,7 +1036,6 @@
                     return;
                 }
 
-                // Construct Header including Concerns column
                 const sheetData = [
                     ['週', '期間', 'ランク', '担当者', '案件名', '受注計上金額(円)', '計上月', 'ステータス', '内容 (行動履歴・次回アクション)', '懸念・問題事項']
                 ];
@@ -2105,10 +1974,6 @@
 
             concernCountBadge.innerText = `${reportedConcerns.length}件`;
 
-            // Reset AI wrapper if week changed
-            document.getElementById('aiSummaryResultWrapper').classList.add('hidden');
-            document.getElementById('aiSummaryContent').innerHTML = '';
-
             if (reportedConcerns.length === 0) {
                 concernsContainer.innerHTML = `
                     <div class="py-6 text-center text-solid-400 text-xs bg-solid-50 rounded border border-dashed border-solid-300">
@@ -2117,7 +1982,7 @@
                     </div>
                 `;
             } else {
-                concernsContainer.innerHTML = reportedConcerns.map((r, i) => {
+                concernsContainer.innerHTML = reportedConcerns.map((r) => {
                     const rank = getRankBadge(r.status);
                     return `
                         <div class="p-3 bg-white rounded border border-amber-200 shadow-xs space-y-1.5">
@@ -2230,11 +2095,10 @@
                                 <span class="text-xs text-brand-600 font-medium">(${info.range})</span>
                                 ${isCurrent ? '<span class="bg-brand-500 text-white text-[9px] px-1.5 py-0.2 rounded font-bold">表示中</span>' : ''}
                             </div>
-                            <div class="flex items-center space-x-2">
+                            <div class="flex items-center space-x-2.5">
                                 <span class="text-xs text-solid-600">登録案件: <strong class="text-solid-900">${weekObj.records.length}</strong> 件</span>
                                 ${weekTotalAmt > 0 ? `<span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">計上総額: ¥${weekTotalAmt.toLocaleString()}</span>` : ''}
                                 
-                                <!-- Single Week Excel Export Button -->
                                 <button onclick="exportHistoryToExcel('${wKey}')" class="text-xs text-emerald-700 hover:text-white font-bold flex items-center bg-emerald-50 hover:bg-emerald-600 px-2 py-1 rounded border border-emerald-300 transition-colors" title="この週のデータをExcel形式で出力">
                                     <i class="fa-solid fa-file-excel mr-1 text-[11px]"></i>Excel出力
                                 </button>
