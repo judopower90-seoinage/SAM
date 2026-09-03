@@ -93,7 +93,7 @@
                 <h1 class="text-sm font-bold tracking-tight">Sales Activity Management</h1>
                 <div class="flex items-center space-x-1.5 mt-0.5">
                     <span id="mobileSyncDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
-                    <span id="mobileSyncStatus" class="text-[10px] text-solid-300">同期完了</span>
+                    <span id="mobileSyncStatus" class="text-[10px] text-solid-300">保存完了</span>
                 </div>
             </div>
         </div>
@@ -128,13 +128,22 @@
                 </button>
             </div>
 
-            <!-- Auto-save / Cloud Sync Status Badge -->
-            <div class="mt-3 px-2.5 py-1.5 rounded bg-solid-900 border border-solid-800 flex items-center justify-between">
-                <div class="flex items-center space-x-2 text-[11px]">
-                    <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span id="syncStatusText" class="text-solid-300 font-medium">クラウド保存: 同期中</span>
+            <!-- Auto-save / File Overwrite Status Badge -->
+            <div id="fileSaveStatusBadge" class="mt-3 px-2.5 py-2 rounded bg-solid-900 border border-solid-800 flex flex-col space-y-1">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-1.5 text-[11px]">
+                        <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span id="syncStatusText" class="text-solid-200 font-bold">自動上書き保存中</span>
+                    </div>
+                    <i class="fa-solid fa-floppy-disk text-xs text-brand-400"></i>
                 </div>
-                <i class="fa-solid fa-cloud text-xs text-brand-400"></i>
+                <div id="currentSaveFileLabel" class="text-[10px] text-brand-300 truncate font-mono" title="保存先未設定（初回保存先を指定してください）">
+                    保存先: 未設定（内部自動保存中）
+                </div>
+                <!-- Reconnect button if permission needed -->
+                <button id="reconnectFileBtn" onclick="reconnectLastFileHandle()" class="hidden mt-1 px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-[10px] font-bold text-center transition">
+                    前回ファイルに再接続
+                </button>
             </div>
         </div>
 
@@ -180,19 +189,19 @@
         <!-- Sidebar Bottom / Utilities & C.P.O Logo (White on Dark Navy) -->
         <div class="p-4 border-t border-solid-800 bg-solid-950 space-y-2.5">
             <div class="px-1 text-[10px] uppercase font-bold tracking-wider text-solid-500">
-                データ管理・出力
+                保存先ファイル・出力
             </div>
+
+            <!-- Choose / Change Auto-Save File Button -->
+            <button onclick="chooseSaveFileLocation()" class="w-full flex items-center space-x-2 px-3 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded text-xs font-semibold border border-brand-500 shadow-xs transition-colors group">
+                <i class="fa-solid fa-folder-open text-white text-xs w-4 text-center"></i>
+                <span>保存先を指定・変更</span>
+            </button>
 
             <!-- Export to Excel Button in Sidebar -->
             <button onclick="exportHistoryToExcel(); toggleMobileSidebar(false);" class="w-full flex items-center space-x-2 px-3 py-2 bg-emerald-950/80 hover:bg-emerald-600 text-emerald-200 hover:text-white rounded text-xs font-semibold border border-emerald-800 hover:border-emerald-600 transition-colors group">
                 <i class="fa-solid fa-file-excel text-emerald-400 group-hover:text-white text-xs w-4 text-center"></i>
                 <span>全履歴をExcel出力</span>
-            </button>
-
-            <!-- Save Data Button -->
-            <button onclick="saveDataToFile()" class="w-full flex items-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-brand-500 text-white rounded text-xs font-semibold border border-solid-800 hover:border-brand-500 transition-colors group">
-                <i class="fa-solid fa-floppy-disk text-brand-400 group-hover:text-white text-xs w-4 text-center"></i>
-                <span>データバックアップ保存</span>
             </button>
 
             <!-- Restore Data Button -->
@@ -241,7 +250,7 @@
                         </div>
                         <div>
                             <h2 class="text-sm font-bold text-solid-900 uppercase tracking-wide">担当者別 営業行動管理表</h2>
-                            <p class="text-xs text-solid-500 mt-0.5">入力したデータは自動的に安全保存されます。各営業担当者の進行案件、受注計上金額、行動内容、懸念問題事項を管理・更新できます。</p>
+                            <p class="text-xs text-solid-500 mt-0.5">入力したデータは自動的に前回保存先に上書き保存されます。各営業担当者の進行案件、受注計上金額、行動内容、懸念問題事項を管理・更新できます。</p>
                         </div>
                     </div>
                     
@@ -550,7 +559,7 @@
                     </div>
                 </div>
 
-                <!-- Weekly Concerns & Problem Issues (Extracted from Reps, AI removed) -->
+                <!-- Weekly Concerns & Problem Issues (Extracted from Reps) -->
                 <div class="solid-card p-4 rounded-lg space-y-3 border-l-4 border-l-amber-500">
                     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-solid-200 pb-2.5">
                         <div class="flex items-center space-x-2">
@@ -887,6 +896,7 @@
             '-': 4
         };
 
+        // Solid Rank Badge Definitions
         function getRankBadge(status) {
             switch(status) {
                 case '契約':
@@ -979,138 +989,258 @@
         let pendingRestoreData = null;
         let statusChartInstance = null;
 
-        // --- CLOUD PERSISTENCE (FIRESTORE) IMPLEMENTATION ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        let cloudSaveDebounceTimer = null;
+        // --- LOCAL INDEXEDDB & FILE SYSTEM AUTO-SAVE STORAGE ---
+        const IDB_NAME = 'SalesActivityManagementDB';
+        const IDB_STORE = 'app_storage';
+        let currentFileHandle = null;
+        let currentFileName = null;
+        let autoSaveTimer = null;
 
-        function updateSyncBadge(status) {
+        function openIndexedDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(IDB_NAME, 1);
+                req.onupgradeneeded = () => {
+                    req.result.createObjectStore(IDB_STORE);
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function idbSet(key, value) {
+            try {
+                const db = await openIndexedDB();
+                const tx = db.transaction(IDB_STORE, 'readwrite');
+                tx.objectStore(IDB_STORE).put(value, key);
+                return new Promise(resolve => tx.oncomplete = resolve);
+            } catch (err) {
+                console.warn("IndexedDB set error:", err);
+            }
+        }
+
+        async function idbGet(key) {
+            try {
+                const db = await openIndexedDB();
+                const tx = db.transaction(IDB_STORE, 'readonly');
+                const req = tx.objectStore(IDB_STORE).get(key);
+                return new Promise(resolve => {
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => resolve(null);
+                });
+            } catch (err) {
+                return null;
+            }
+        }
+
+        function updateSaveStatusUI(status, label = null) {
             const dot = document.getElementById('syncStatusDot');
             const txt = document.getElementById('syncStatusText');
             const mDot = document.getElementById('mobileSyncDot');
             const mTxt = document.getElementById('mobileSyncStatus');
+            const fileLabel = document.getElementById('currentSaveFileLabel');
+            const reconnectBtn = document.getElementById('reconnectFileBtn');
+
+            if (label && fileLabel) {
+                fileLabel.innerText = label;
+                fileLabel.title = label;
+            }
+
+            if (reconnectBtn) {
+                if (status === 'need_permission') {
+                    reconnectBtn.classList.remove('hidden');
+                } else {
+                    reconnectBtn.classList.add('hidden');
+                }
+            }
 
             if (!dot || !txt) return;
 
-            if (status === 'syncing') {
+            if (status === 'saving') {
                 dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
-                txt.innerText = 'クラウド保存: 保存中...';
+                txt.innerText = '自動保存中...';
                 if (mDot && mTxt) {
                     mDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping inline-block';
                     mTxt.innerText = '保存中...';
                 }
-            } else if (status === 'synced') {
+            } else if (status === 'saved') {
                 dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
-                txt.innerText = 'クラウド保存: 同期済み';
+                txt.innerText = currentFileName ? '自動上書き保存完了' : '内部保存完了';
                 if (mDot && mTxt) {
                     mDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block';
-                    mTxt.innerText = '同期完了';
+                    mTxt.innerText = '保存完了';
+                }
+            } else if (status === 'need_permission') {
+                dot.className = 'w-2 h-2 rounded-full bg-amber-500';
+                txt.innerText = 'ファイル再接続待ち';
+                if (mDot && mTxt) {
+                    mDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 inline-block';
+                    mTxt.innerText = '再接続待ち';
                 }
             } else if (status === 'error') {
                 dot.className = 'w-2 h-2 rounded-full bg-rose-500';
-                txt.innerText = 'クラウド保存: エラー';
+                txt.innerText = '保存エラー';
                 if (mDot && mTxt) {
                     mDot.className = 'w-1.5 h-1.5 rounded-full bg-rose-500 inline-block';
-                    mTxt.innerText = '同期エラー';
+                    mTxt.innerText = '保存エラー';
                 }
             }
         }
 
-        async function initCloudPersistence() {
-            if (typeof __firebase_config === 'undefined') {
-                console.log("No firebase configuration in environment; running in session mode.");
-                updateSyncBadge('synced');
-                return;
-            }
+        // Auto Save Routine: Writes to IndexedDB always AND automatically overwrites previous file handle
+        async function executeAutoSave(showFeedbackToast = false) {
+            updateSaveStatusUI('saving');
 
-            try {
-                updateSyncBadge('syncing');
-                const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
-                const { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
-                const { getFirestore, doc, setDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js');
+            const exportPayload = {
+                version: '1.0',
+                exportedAt: new Date().toISOString(),
+                appState: appState
+            };
+            const jsonString = JSON.stringify(exportPayload, null, 2);
 
-                const firebaseConfig = JSON.parse(__firebase_config);
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                const db = getFirestore(app);
+            // 1. Always save to local browser persistent storage (Zero data loss upon refresh)
+            await idbSet('latest_app_state', exportPayload);
 
-                // RULE 3: Authenticate FIRST before queries
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+            // 2. Overwrite the previously chosen file if handle exists
+            if (currentFileHandle) {
+                try {
+                    const permissionOpts = { mode: 'readwrite' };
+                    let perm = await currentFileHandle.queryPermission(permissionOpts);
+                    if (perm !== 'granted') {
+                        updateSaveStatusUI('need_permission', `保存先: ${currentFileName} (要再接続)`);
+                        return;
+                    }
+
+                    const writable = await currentFileHandle.createWritable();
+                    await writable.write(jsonString);
+                    await writable.close();
+
+                    updateSaveStatusUI('saved', `保存先: ${currentFileName} (自動上書き済)`);
+                    if (showFeedbackToast) showToast(`「${currentFileName}」に上書き保存しました`);
+                    return;
+                } catch (err) {
+                    console.warn("Auto save to file handle failed:", err);
+                    updateSaveStatusUI('need_permission', `保存先: ${currentFileName} (要再接続)`);
+                    return;
                 }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (!user) return;
-
-                    // RULE 1: Strict collection path /artifacts/{appId}/public/data/{collectionName}
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sales_management_data', 'main_state');
-
-                    // RULE 2: Single document listener (No complex queries) with mandatory error callback
-                    onSnapshot(docRef, (docSnap) => {
-                        if (docSnap.exists()) {
-                            const data = docSnap.data();
-                            if (data && data.weeks) {
-                                appState.masterReps = data.masterReps || appState.masterReps;
-                                appState.weeks = data.weeks || appState.weeks;
-                                if (data.currentWeekMondayStr && appState.weeks[data.currentWeekMondayStr]) {
-                                    appState.currentWeekMondayStr = data.currentWeekMondayStr;
-                                }
-                                renderAll();
-                            }
-                        } else {
-                            // First initialization: save initial state
-                            setDoc(docRef, {
-                                masterReps: appState.masterReps,
-                                currentWeekMondayStr: appState.currentWeekMondayStr,
-                                weeks: appState.weeks,
-                                updatedAt: new Date().toISOString()
-                            }).catch(err => console.error("Initial doc creation error:", err));
-                        }
-                        updateSyncBadge('synced');
-                    }, (err) => {
-                        console.error("Firestore snapshot error:", err);
-                        updateSyncBadge('error');
-                    });
-
-                    // Define internal cloud save function
-                    window._persistAppStateToCloud = async function() {
-                        if (!auth.currentUser) return;
-                        updateSyncBadge('syncing');
-                        try {
-                            await setDoc(docRef, {
-                                masterReps: appState.masterReps,
-                                currentWeekMondayStr: appState.currentWeekMondayStr,
-                                weeks: appState.weeks,
-                                updatedAt: new Date().toISOString()
-                            });
-                            updateSyncBadge('synced');
-                        } catch (e) {
-                            console.error("Failed to persist data to cloud:", e);
-                            updateSyncBadge('error');
-                        }
-                    };
-                });
-            } catch (err) {
-                console.error("Cloud persistence init error:", err);
-                updateSyncBadge('error');
             }
+
+            updateSaveStatusUI('saved', '保存先: 未設定（内部自動保存中）');
+            if (showFeedbackToast) showToast('データを内部保存しました');
         }
 
-        function triggerCloudSave() {
-            if (typeof window._persistAppStateToCloud === 'function') {
-                if (cloudSaveDebounceTimer) clearTimeout(cloudSaveDebounceTimer);
-                cloudSaveDebounceTimer = setTimeout(() => {
-                    window._persistAppStateToCloud();
+        // Trigger with brief debounce so multiple rapid edits don't choke the disk
+        function triggerAutoSave(immediate = false) {
+            if (autoSaveTimer) clearTimeout(autoSaveTimer);
+            if (immediate) {
+                executeAutoSave(false);
+            } else {
+                autoSaveTimer = setTimeout(() => {
+                    executeAutoSave(false);
                 }, 300);
             }
         }
 
+        // Explicitly choose or change the target file to auto-overwrite
+        async function chooseSaveFileLocation() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const defaultName = currentFileName || `営業行動管理データ_${y}${m}${d}.json`;
+
+            if (window.showSaveFilePicker) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: defaultName,
+                        startIn: 'desktop',
+                        types: [{
+                            description: 'JSON ファイル (*.json)',
+                            accept: { 'application/json': ['.json'] }
+                        }]
+                    });
+
+                    currentFileHandle = handle;
+                    currentFileName = handle.name;
+
+                    // Save handle reference to IndexedDB for subsequent page visits
+                    await idbSet('saved_file_handle', handle);
+                    await idbSet('saved_file_name', handle.name);
+
+                    // Immediately write current state to the chosen file
+                    await executeAutoSave(true);
+                    updateSaveStatusUI('saved', `保存先: ${currentFileName} (自動上書き有効)`);
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                    console.warn("showSaveFilePicker failed:", err);
+                }
+            }
+
+            // Fallback for browsers without File System Access API: trigger JSON download
+            saveDataToFile();
+        }
+
+        // Manual reconnect button if user reloaded and browser requires user-gesture for disk write
+        async function reconnectLastFileHandle() {
+            if (!currentFileHandle) return;
+            try {
+                const perm = await currentFileHandle.requestPermission({ mode: 'readwrite' });
+                if (perm === 'granted') {
+                    await executeAutoSave(true);
+                    updateSaveStatusUI('saved', `保存先: ${currentFileName} (自動上書き有効)`);
+                    showToast(`「${currentFileName}」との自動上書きを再開しました`);
+                } else {
+                    showToast('保存先への書き込み権限が許可されませんでした', true);
+                }
+            } catch (err) {
+                console.error("Reconnect handle error:", err);
+                showToast('再接続に失敗しました。保存先を再選択してください', true);
+            }
+        }
+
+        // Initialize state on page load: restore from IndexedDB if exists
+        async function restoreStateFromPersistence() {
+            try {
+                // 1. Restore actual app state (data never wiped upon refresh)
+                const storedPayload = await idbGet('latest_app_state');
+                if (storedPayload && storedPayload.appState && storedPayload.appState.weeks) {
+                    const s = storedPayload.appState;
+                    appState.masterReps = s.masterReps || appState.masterReps;
+                    appState.weeks = s.weeks || appState.weeks;
+                    if (s.currentWeekMondayStr && appState.weeks[s.currentWeekMondayStr]) {
+                        appState.currentWeekMondayStr = s.currentWeekMondayStr;
+                    }
+                }
+
+                // 2. Restore file handle reference
+                const storedHandle = await idbGet('saved_file_handle');
+                const storedName = await idbGet('saved_file_name');
+
+                if (storedHandle && storedName) {
+                    currentFileHandle = storedHandle;
+                    currentFileName = storedName;
+
+                    // Test permission
+                    const perm = await currentFileHandle.queryPermission({ mode: 'readwrite' });
+                    if (perm === 'granted') {
+                        updateSaveStatusUI('saved', `保存先: ${currentFileName} (自動上書き中)`);
+                    } else {
+                        updateSaveStatusUI('need_permission', `保存先: ${currentFileName} (要再接続)`);
+                    }
+                } else {
+                    updateSaveStatusUI('saved', '保存先: 未設定（内部自動保存中）');
+                }
+            } catch (err) {
+                console.warn("Storage restoration error:", err);
+            } finally {
+                renderRepDropdowns();
+                renderAll();
+            }
+        }
+
         window.onload = function() {
-            renderRepDropdowns();
-            renderAll();
+            restoreStateFromPersistence();
             switchView('table');
-            initCloudPersistence();
         };
 
         function toggleMobileSidebar(forceState) {
@@ -1340,7 +1470,7 @@
             input.value = '';
             renderRepManageList();
             renderRepDropdowns();
-            triggerCloudSave();
+            triggerAutoSave();
             showToast(`担当者「${name}」を追加しました`);
         }
 
@@ -1367,7 +1497,7 @@
             renderRepManageList();
             renderRepDropdowns();
             renderAll();
-            triggerCloudSave();
+            triggerAutoSave();
             showToast(`担当者名を「${trimmedNew}」に更新しました`);
         }
 
@@ -1381,17 +1511,17 @@
             renderRepManageList();
             renderRepDropdowns();
             renderAll();
-            triggerCloudSave();
+            triggerAutoSave();
             showToast(`担当者「${repName}」を削除しました`);
         }
 
-        // --- FILE SAVE / RESTORE IMPLEMENTATION (JSON Backup) ---
+        // --- MANUAL FILE BACKUP DOWNLOAD (Standard Fallback) ---
         async function saveDataToFile() {
             const now = new Date();
             const y = now.getFullYear();
             const m = String(now.getMonth() + 1).padStart(2, '0');
             const d = String(now.getDate()).padStart(2, '0');
-            const fileName = `営業行動管理データ_${y}${m}${d}.json`;
+            const fileName = currentFileName || `営業行動管理データ_${y}${m}${d}.json`;
 
             const exportPayload = {
                 version: '1.0',
@@ -1399,27 +1529,6 @@
                 appState: appState
             };
             const jsonString = JSON.stringify(exportPayload, null, 2);
-
-            if (window.showSaveFilePicker) {
-                try {
-                    const handle = await window.showSaveFilePicker({
-                        suggestedName: fileName,
-                        startIn: 'desktop',
-                        types: [{
-                            description: 'JSON ファイル (*.json)',
-                            accept: { 'application/json': ['.json'] }
-                        }]
-                    });
-                    const writable = await handle.createWritable();
-                    await writable.write(jsonString);
-                    await writable.close();
-                    showToast('選択した保存先にデータを保存しました');
-                    return;
-                } catch (err) {
-                    if (err.name === 'AbortError') return;
-                    console.warn('showSaveFilePicker failed, falling back to download:', err);
-                }
-            }
 
             try {
                 const blob = new Blob([jsonString], { type: 'application/json' });
@@ -1431,9 +1540,9 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                showToast('データをファイルとして保存しました');
+                showToast('データをバックアップファイルとして保存しました');
             } catch (err) {
-                console.error('Data export error:', err);
+                console.error("Data export error:", err);
                 showToast('データの保存に失敗しました', true);
             }
         }
@@ -1451,6 +1560,12 @@
                     });
                     const file = await handle.getFile();
                     const text = await file.text();
+
+                    currentFileHandle = handle;
+                    currentFileName = handle.name;
+                    await idbSet('saved_file_handle', handle);
+                    await idbSet('saved_file_name', handle.name);
+
                     parseAndConfirmRestore(text);
                     return;
                 } catch (err) {
@@ -1468,6 +1583,7 @@
             const file = event.target.files[0];
             if (!file) return;
 
+            currentFileName = file.name;
             const reader = new FileReader();
             reader.onload = function(e) {
                 parseAndConfirmRestore(e.target.result);
@@ -1513,7 +1629,7 @@
             pendingRestoreData = null;
         }
 
-        function executeRestore() {
+        async function executeRestore() {
             if (!pendingRestoreData) return;
 
             appState = {
@@ -1535,7 +1651,7 @@
             closeRestoreModal();
             renderRepDropdowns();
             renderAll();
-            triggerCloudSave();
+            await executeAutoSave(false);
             showToast('データを正常に復元しました');
         }
 
@@ -1586,13 +1702,13 @@
 
             appState.currentWeekMondayStr = targetMonStr;
             renderAll();
-            triggerCloudSave();
+            triggerAutoSave();
         }
 
         function onWeekDropdownChange(val) {
             appState.currentWeekMondayStr = val;
             renderAll();
-            triggerCloudSave();
+            triggerAutoSave();
         }
 
         function jumpToCurrentWeek() {
@@ -1605,7 +1721,7 @@
             }
             appState.currentWeekMondayStr = todayMonStr;
             renderAll();
-            triggerCloudSave();
+            triggerAutoSave();
         }
 
         function getCurrentRecords() {
@@ -1961,7 +2077,7 @@
 
             closeRecordModal();
             renderAll();
-            triggerCloudSave();
+            triggerAutoSave();
         }
 
         function deleteRecord(id) {
@@ -1970,7 +2086,7 @@
             if (index !== -1) {
                 records.splice(index, 1);
                 renderAll();
-                triggerCloudSave();
+                triggerAutoSave();
             }
         }
 
@@ -2019,7 +2135,7 @@
             appState.currentWeekMondayStr = monStr;
             closeNewWeekModal();
             renderAll();
-            triggerCloudSave();
+            triggerAutoSave();
         }
 
         function renderAnalytics() {
