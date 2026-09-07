@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js for summary visual analytics -->
+    <!-- Chart.js for visual analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SheetJS (xlsx) for Excel export -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -42,7 +42,7 @@
                             200: '#bae6fd',
                             300: '#7dd3fc',
                             400: '#38bdf8',
-                            500: '#0284c7', // Solid Strong Sky/Blue
+                            500: '#0284c7',
                             600: '#0369a1',
                             700: '#075985',
                             800: '#0c4a6e',
@@ -97,7 +97,7 @@
                 </div>
             </div>
         </div>
-        <button onclick="toggleMobileSidebar()" class="p-2 rounded text-solid-300 hover:text-white hover:bg-solid-800 transition">
+        <button type="button" onclick="toggleMobileSidebar()" class="p-2 rounded text-solid-300 hover:text-white hover:bg-solid-800 transition">
             <i class="fa-solid fa-bars text-lg"></i>
         </button>
     </header>
@@ -123,7 +123,7 @@
                     </div>
                 </div>
                 <!-- Close Button on Mobile -->
-                <button onclick="toggleMobileSidebar(false)" class="md:hidden text-solid-400 hover:text-white p-1">
+                <button type="button" onclick="toggleMobileSidebar(false)" class="md:hidden text-solid-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -137,11 +137,11 @@
                     </div>
                     <i class="fa-solid fa-floppy-disk text-xs text-brand-400"></i>
                 </div>
-                <div id="currentSaveFileLabel" class="text-[10px] text-brand-300 truncate font-mono" title="保存先未設定（初回保存先を指定してください）">
+                <div id="currentSaveFileLabel" class="text-[10px] text-brand-300 truncate font-mono" title="保存先未設定（内部自動保存中）">
                     保存先: 未設定（内部自動保存中）
                 </div>
                 <!-- Reconnect button if permission needed -->
-                <button id="reconnectFileBtn" onclick="reconnectLastFileHandle()" class="hidden mt-1 px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-[10px] font-bold text-center transition">
+                <button type="button" id="reconnectFileBtn" onclick="reconnectLastFileHandle()" class="hidden mt-1 px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-[10px] font-bold text-center transition">
                     前回ファイルに再接続
                 </button>
             </div>
@@ -154,32 +154,32 @@
             </div>
 
             <!-- Menu Item 1: Action Table -->
-            <button id="sideTabTable" onclick="switchView('table'); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left nav-item-active">
+            <button type="button" id="sideTabTable" onclick="switchView('table'); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left nav-item-active">
                 <i class="fa-solid fa-list-check text-sm text-brand-400 w-5 text-center"></i>
                 <span class="flex-1">担当別行動管理表</span>
             </button>
 
             <!-- Menu Item 2: Analytics -->
-            <button id="sideTabAnalytics" onclick="switchView('analytics'); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left">
+            <button type="button" id="sideTabAnalytics" onclick="switchView('analytics'); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left">
                 <i class="fa-solid fa-chart-pie text-sm text-amber-400 w-5 text-center"></i>
                 <span class="flex-1">週次分析</span>
             </button>
 
             <!-- Menu Item 3: History -->
-            <button id="sideTabHistory" onclick="switchView('history'); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left">
+            <button type="button" id="sideTabHistory" onclick="switchView('history'); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left">
                 <i class="fa-solid fa-clock-rotate-left text-sm text-indigo-400 w-5 text-center"></i>
                 <span class="flex-1">全履歴タイムライン</span>
             </button>
 
             <!-- Action: Rep Management Button in Sidebar -->
-            <button onclick="openRepManageModal(); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left">
+            <button type="button" onclick="openRepManageModal(); toggleMobileSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left">
                 <i class="fa-solid fa-user-gear text-sm text-emerald-400 w-5 text-center"></i>
                 <span class="flex-1">担当者マスター登録</span>
             </button>
 
             <!-- Action: New Week Creation -->
             <div class="pt-3 px-1">
-                <button onclick="openNewWeekModal(); toggleMobileSidebar(false);" class="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-solid-800 text-brand-300 hover:text-white rounded text-xs font-semibold border border-solid-800 transition-colors">
+                <button type="button" onclick="openNewWeekModal(); toggleMobileSidebar(false);" class="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-solid-800 text-brand-300 hover:text-white rounded text-xs font-semibold border border-solid-800 transition-colors">
                     <i class="fa-solid fa-calendar-plus text-brand-400"></i>
                     <span>新規週を作成</span>
                 </button>
@@ -193,19 +193,19 @@
             </div>
 
             <!-- Choose / Change Auto-Save File Button -->
-            <button onclick="chooseSaveFileLocation()" class="w-full flex items-center space-x-2 px-3 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded text-xs font-semibold border border-brand-500 shadow-xs transition-colors group">
+            <button type="button" onclick="chooseSaveFileLocation()" class="w-full flex items-center space-x-2 px-3 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded text-xs font-semibold border border-brand-500 shadow-xs transition-colors group">
                 <i class="fa-solid fa-folder-open text-white text-xs w-4 text-center"></i>
                 <span>保存先を指定・変更</span>
             </button>
 
             <!-- Export to Excel Button in Sidebar -->
-            <button onclick="exportHistoryToExcel(); toggleMobileSidebar(false);" class="w-full flex items-center space-x-2 px-3 py-2 bg-emerald-950/80 hover:bg-emerald-600 text-emerald-200 hover:text-white rounded text-xs font-semibold border border-emerald-800 hover:border-emerald-600 transition-colors group">
+            <button type="button" onclick="exportHistoryToExcel(); toggleMobileSidebar(false);" class="w-full flex items-center space-x-2 px-3 py-2 bg-emerald-950/80 hover:bg-emerald-600 text-emerald-200 hover:text-white rounded text-xs font-semibold border border-emerald-800 hover:border-emerald-600 transition-colors group">
                 <i class="fa-solid fa-file-excel text-emerald-400 group-hover:text-white text-xs w-4 text-center"></i>
                 <span>全履歴をExcel出力</span>
             </button>
 
             <!-- Restore Data Button -->
-            <button onclick="restoreDataFromFile()" class="w-full flex items-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-solid-800 text-solid-200 hover:text-white rounded text-xs font-semibold border border-solid-800 transition-colors group">
+            <button type="button" onclick="restoreDataFromFile()" class="w-full flex items-center space-x-2 px-3 py-2 bg-solid-900 hover:bg-solid-800 text-solid-200 hover:text-white rounded text-xs font-semibold border border-solid-800 transition-colors group">
                 <i class="fa-solid fa-arrow-rotate-left text-indigo-400 group-hover:text-white text-xs w-4 text-center"></i>
                 <span>ファイルから復元</span>
             </button>
@@ -250,13 +250,13 @@
                         </div>
                         <div>
                             <h2 class="text-sm font-bold text-solid-900 uppercase tracking-wide">担当者別 営業行動管理表</h2>
-                            <p class="text-xs text-solid-500 mt-0.5">入力したデータは自動的に前回保存先に上書き保存されます。各営業担当者の進行案件、受注計上金額、行動内容、懸念問題事項を管理・更新できます。</p>
+                            <p class="text-xs text-solid-500 mt-0.5">入力したデータは自動保存されます。懸念問題事項は「解決」ボタンを押すことで解決済みとして履歴に残ります。</p>
                         </div>
                     </div>
                     
                     <div class="flex flex-wrap items-center gap-2">
                         <!-- Rep Master Management Trigger -->
-                        <button onclick="openRepManageModal()" class="px-3 py-1.5 bg-solid-100 hover:bg-solid-200 text-solid-800 text-xs font-bold rounded border border-solid-300 transition-colors flex items-center space-x-1.5">
+                        <button type="button" onclick="openRepManageModal()" class="px-3 py-1.5 bg-solid-100 hover:bg-solid-200 text-solid-800 text-xs font-bold rounded border border-solid-300 transition-colors flex items-center space-x-1.5">
                             <i class="fa-solid fa-user-pen text-brand-500 text-xs"></i>
                             <span>担当者の登録・編集</span>
                         </button>
@@ -274,7 +274,7 @@
                 <!-- Week Selector Toolbar in Table View -->
                 <div class="solid-card rounded-lg p-3.5 flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="flex items-center space-x-2 w-full md:w-auto justify-between md:justify-start">
-                        <button onclick="navigateWeek(-1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="前週へ">
+                        <button type="button" onclick="navigateWeek(-1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="前週へ">
                             <i class="fa-solid fa-chevron-left text-xs"></i>
                         </button>
                         <div class="text-center md:text-left">
@@ -284,7 +284,7 @@
                                 <span>-</span>
                             </div>
                         </div>
-                        <button onclick="navigateWeek(1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="次週へ">
+                        <button type="button" onclick="navigateWeek(1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="次週へ">
                             <i class="fa-solid fa-chevron-right text-xs"></i>
                         </button>
                     </div>
@@ -293,7 +293,7 @@
                         <select id="tableWeekSelectDropdown" onchange="onWeekDropdownChange(this.value)" class="bg-white border border-solid-300 text-solid-800 text-xs rounded focus:ring-1 focus:ring-brand-500 focus:border-brand-500 p-2 font-semibold">
                             <!-- Dynamic Week Options -->
                         </select>
-                        <button onclick="jumpToCurrentWeek()" class="px-3 py-2 bg-solid-100 hover:bg-solid-200 text-solid-800 text-xs font-semibold rounded border border-solid-300 transition-colors whitespace-nowrap">
+                        <button type="button" onclick="jumpToCurrentWeek()" class="px-3 py-2 bg-solid-100 hover:bg-solid-200 text-solid-800 text-xs font-semibold rounded border border-solid-300 transition-colors whitespace-nowrap">
                             今週へ移動
                         </button>
                     </div>
@@ -359,42 +359,36 @@
                         <table class="w-full text-left border-collapse min-w-[950px]">
                             <thead>
                                 <tr class="bg-solid-100 border-b border-solid-200 text-[11px] uppercase tracking-wider text-solid-600 font-bold">
-                                    <!-- Clickable Sortable TH: Rank -->
                                     <th class="py-3 px-3 w-16 text-center sortable-th" onclick="toggleSort('rank')" title="クリックでランク順（A/B/C）に並び替え">
                                         <div class="flex items-center justify-center space-x-1">
                                             <span>ランク</span>
                                             <span id="sortIconRank" class="text-solid-400 text-xs"><i class="fa-solid fa-sort"></i></span>
                                         </div>
                                     </th>
-                                    <!-- Clickable Sortable TH: Rep -->
                                     <th class="py-3 px-3 w-32 sortable-th" onclick="toggleSort('rep')" title="クリックで担当者あいうえお順に並び替え">
                                         <div class="flex items-center justify-between">
                                             <span>担当者</span>
                                             <span id="sortIconRep" class="text-slate-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
                                         </div>
                                     </th>
-                                    <!-- Clickable Sortable TH: Title -->
                                     <th class="py-3 px-3 w-44 sortable-th" onclick="toggleSort('title')" title="クリックで案件名順に並び替え">
                                         <div class="flex items-center justify-between">
                                             <span>案件名</span>
                                             <span id="sortIconTitle" class="text-slate-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
                                         </div>
                                     </th>
-                                    <!-- Clickable Sortable TH: Amount -->
                                     <th class="py-3 px-3 w-32 sortable-th" onclick="toggleSort('amount')" title="クリックで受注計上金額順に並び替え">
                                         <div class="flex items-center justify-between">
                                             <span>受注計上金額</span>
                                             <span id="sortIconAmount" class="text-slate-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
                                         </div>
                                     </th>
-                                    <!-- Clickable Sortable TH: Detail -->
                                     <th class="py-3 px-3 sortable-th" onclick="toggleSort('detail')" title="クリックで内容順に並び替え">
                                         <div class="flex items-center justify-between">
                                             <span>内容 (今週の行動・懸念事項・次回アクション)</span>
                                             <span id="sortIconDetail" class="text-slate-400 ml-1 text-xs"><i class="fa-solid fa-sort"></i></span>
                                         </div>
                                     </th>
-                                    <!-- Clickable Sortable TH: Status -->
                                     <th class="py-3 px-3 w-32 sortable-th" onclick="toggleSort('status')" title="クリックでステータス進捗順に並び替え">
                                         <div class="flex items-center justify-between">
                                             <span>ステータス</span>
@@ -420,9 +414,9 @@
                     </div>
                 </div>
 
-                <!-- CENTERED ADD BUTTON BELOW TABLE (Solid Primary Button) -->
+                <!-- CENTERED ADD BUTTON BELOW TABLE -->
                 <div class="flex justify-center items-center py-2">
-                    <button onclick="openRecordModal()" class="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded border border-brand-600 shadow-sm transition-colors flex items-center space-x-2">
+                    <button type="button" onclick="openRecordModal()" class="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded border border-brand-600 shadow-sm transition-colors flex items-center space-x-2">
                         <i class="fa-solid fa-plus text-xs"></i>
                         <span>行動・案件を新規登録</span>
                     </button>
@@ -434,7 +428,7 @@
                 <!-- Week Selector Toolbar (Analytics) -->
                 <div class="solid-card rounded-lg p-3.5 flex flex-col md:flex-row items-center justify-between gap-3">
                     <div class="flex items-center space-x-2 w-full md:w-auto justify-between md:justify-start">
-                        <button onclick="navigateWeek(-1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="前週へ">
+                        <button type="button" onclick="navigateWeek(-1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="前週へ">
                             <i class="fa-solid fa-chevron-left text-xs"></i>
                         </button>
                         <div class="text-center md:text-left">
@@ -444,7 +438,7 @@
                                 <span>-</span>
                             </div>
                         </div>
-                        <button onclick="navigateWeek(1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="次週へ">
+                        <button type="button" onclick="navigateWeek(1)" class="w-8 h-8 flex items-center justify-center rounded border border-solid-300 text-solid-600 hover:bg-solid-100 hover:text-brand-500 transition-colors" title="次週へ">
                             <i class="fa-solid fa-chevron-right text-xs"></i>
                         </button>
                     </div>
@@ -453,13 +447,13 @@
                         <select id="weekSelectDropdown" onchange="onWeekDropdownChange(this.value)" class="bg-white border border-solid-300 text-solid-800 text-xs rounded focus:ring-1 focus:ring-brand-500 focus:border-brand-500 p-2 font-semibold">
                             <!-- Dynamic Week Options -->
                         </select>
-                        <button onclick="jumpToCurrentWeek()" class="px-3 py-2 bg-solid-100 hover:bg-solid-200 text-solid-800 text-xs font-semibold rounded border border-solid-300 transition-colors whitespace-nowrap">
+                        <button type="button" onclick="jumpToCurrentWeek()" class="px-3 py-2 bg-solid-100 hover:bg-solid-200 text-solid-800 text-xs font-semibold rounded border border-solid-300 transition-colors whitespace-nowrap">
                             今週へ移動
                         </button>
                     </div>
                 </div>
 
-                <!-- KPI Cards Grid (Solid Clean Metrics) -->
+                <!-- KPI Cards Grid -->
                 <div id="kpiContainer" class="grid grid-cols-2 lg:grid-cols-5 gap-3">
                     <div class="solid-card p-4 rounded-lg flex flex-col justify-between">
                         <div class="flex justify-between items-center text-solid-500 text-xs font-semibold">
@@ -559,7 +553,7 @@
                     </div>
                 </div>
 
-                <!-- Weekly Concerns & Problem Issues (Extracted from Reps) -->
+                <!-- Weekly Concerns & Problem Issues (With Resolve Action) -->
                 <div class="solid-card p-4 rounded-lg space-y-3 border-l-4 border-l-amber-500">
                     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-solid-200 pb-2.5">
                         <div class="flex items-center space-x-2">
@@ -568,17 +562,17 @@
                             </span>
                             <div>
                                 <h3 class="text-xs font-bold text-solid-900 uppercase tracking-wide flex items-center">
-                                    <span>今週の懸念・問題事項（各担当から抽出）</span>
+                                    <span>今週の懸念・問題事項（未解決課題）</span>
                                     <span id="concernCountBadge" class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">0件</span>
                                 </h3>
-                                <p class="text-[11px] text-solid-500">各営業担当者から報告された懸念点・課題事項を一覧で確認できます</p>
+                                <p class="text-[11px] text-solid-500">解決ボタンを押すと週次分析から非表示になり、各担当別管理表で解決済みとして履歴に残ります</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Concerns List Extracted from Reps -->
                     <div class="space-y-1.5 pt-1">
-                        <div id="concernsListContainer" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+                        <div id="concernsListContainer" class="space-y-2 max-h-72 overflow-y-auto custom-scrollbar pr-1">
                             <!-- Dynamic Concerns Items -->
                         </div>
                     </div>
@@ -619,7 +613,7 @@
                         </div>
                         <div class="flex items-center space-x-2">
                             <!-- Excel Export All Button -->
-                            <button onclick="exportHistoryToExcel()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded border border-emerald-700 shadow-xs transition-colors flex items-center space-x-1.5" title="全週の履歴をエクセル形式(.xlsx)で一括ダウンロード">
+                            <button type="button" onclick="exportHistoryToExcel()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded border border-emerald-700 shadow-xs transition-colors flex items-center space-x-1.5" title="全週の履歴をエクセル形式(.xlsx)で一括ダウンロード">
                                 <i class="fa-solid fa-file-excel text-xs"></i>
                                 <span>Excel形式で全履歴を出力 (.xlsx)</span>
                             </button>
@@ -646,7 +640,7 @@
                     <i class="fa-solid fa-pen text-brand-500 text-xs"></i>
                     <h3 id="recordModalTitle" class="text-xs font-bold text-solid-900 uppercase tracking-wider">案件・行動の追加</h3>
                 </div>
-                <button onclick="closeRecordModal()" class="w-6 h-6 rounded hover:bg-solid-200 text-solid-500 hover:text-solid-800 flex items-center justify-center transition-colors">
+                <button type="button" onclick="closeRecordModal()" class="w-6 h-6 rounded hover:bg-solid-200 text-solid-500 hover:text-solid-800 flex items-center justify-center transition-colors">
                     <i class="fa-solid fa-xmark text-xs"></i>
                 </button>
             </div>
@@ -742,6 +736,14 @@
                         <span class="text-[10px] text-solid-400 font-normal">任意 (週次分析で抽出・集約されます)</span>
                     </div>
                     <textarea id="modalConcerns" rows="2" placeholder="競合の動き、価格交渉での難航、先方社内稟議の停滞、納期懸念など、問題点やサポートが必要な事項があれば記入してください。" class="w-full bg-white border border-amber-300 focus:border-amber-500 text-solid-900 text-xs rounded p-2 focus:ring-1 focus:ring-amber-500"></textarea>
+                    
+                    <!-- Resolved check in modal -->
+                    <div id="modalConcernResolvedWrapper" class="hidden mt-1.5 flex items-center space-x-2">
+                        <label class="flex items-center space-x-1.5 cursor-pointer text-xs text-solid-700 font-semibold">
+                            <input type="checkbox" id="modalConcernResolved" class="rounded text-emerald-600 focus:ring-emerald-500">
+                            <span>この懸念事項を「解決済み」にする</span>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Form Actions -->
@@ -766,7 +768,7 @@
                     <i class="fa-solid fa-user-gear text-brand-500 text-xs"></i>
                     <h3 class="text-xs font-bold text-solid-900 uppercase tracking-wider">担当者マスター登録・編集</h3>
                 </div>
-                <button onclick="closeRepManageModal()" class="w-6 h-6 rounded hover:bg-solid-200 text-solid-500 hover:text-solid-800 flex items-center justify-center">
+                <button type="button" onclick="closeRepManageModal()" class="w-6 h-6 rounded hover:bg-solid-200 text-solid-500 hover:text-solid-800 flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-xs"></i>
                 </button>
             </div>
@@ -812,7 +814,7 @@
                     <i class="fa-solid fa-calendar-plus text-brand-500 text-xs"></i>
                     <h3 class="text-xs font-bold text-solid-900 uppercase tracking-wider">新規週の追加作成</h3>
                 </div>
-                <button onclick="closeNewWeekModal()" class="w-6 h-6 rounded hover:bg-solid-200 text-solid-500 hover:text-solid-800 flex items-center justify-center">
+                <button type="button" onclick="closeNewWeekModal()" class="w-6 h-6 rounded hover:bg-solid-200 text-solid-500 hover:text-solid-800 flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-xs"></i>
                 </button>
             </div>
@@ -828,7 +830,7 @@
                         <input type="checkbox" id="carryOverUnfinished" checked class="mt-0.5 rounded text-brand-500 focus:ring-brand-500">
                         <div>
                             <span class="text-xs font-bold text-solid-900">前週の未完了案件を引き継ぐ</span>
-                            <p class="text-[10px] text-solid-600 leading-tight mt-0.5">「契約」「完了」「失注」以外の進行中案件を次週のデータとしてコピーします。</p>
+                            <p class="text-[10px] text-solid-600 leading-tight mt-0.5">「契約」「完了」「失注」以外の進行中案件を次週のデータとしてコピーします。（※解決済みの懸念事項は完了として持ち越されません）</p>
                         </div>
                     </label>
                 </div>
@@ -872,7 +874,7 @@
     </div>
 
     <script>
-        // --- DATA STRUCTURE & INITIAL STATE ---
+        // --- 1. CONSTANTS & PIPELINE DEFINITIONS ---
         const INITIAL_MASTER_REPS = [
             '村上', '澁井', '酒井', '齋藤', '髙木', '上石',
             '佐藤', '金子', '出水', '多田羅', '中村', '中山'
@@ -896,7 +898,74 @@
             '-': 4
         };
 
-        // Solid Rank Badge Definitions
+        const IDB_NAME = 'SalesActivityManagementDB';
+        const IDB_STORE = 'app_storage';
+
+        // Security: HTML Escape function to prevent DOM-based XSS
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => {
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return map[char];
+            });
+        }
+
+        // Date handling: Parse YYYY-MM-DD as local date to prevent UTC timezone shifts
+        function parseLocalDate(dateStr) {
+            if (!dateStr) return null;
+            const parts = dateStr.split('-').map(Number);
+            if (parts.length !== 3 || parts.some(Number.isNaN)) {
+                return null;
+            }
+            const [year, month, day] = parts;
+            return new Date(year, month - 1, day);
+        }
+
+        function formatDateStr(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function getMondayOfDate(d) {
+            const date = new Date(d);
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(date.setDate(diff));
+        }
+
+        function getWeekInfo(mondayStr) {
+            const mon = parseLocalDate(mondayStr) || new Date();
+            const sun = new Date(mon);
+            sun.setDate(sun.getDate() + 6);
+
+            const year = mon.getFullYear();
+            const month = mon.getMonth() + 1;
+
+            const firstDay = new Date(year, mon.getMonth(), 1);
+            const dayOffset = (firstDay.getDay() + 6) % 7;
+            const weekNum = Math.floor((mon.getDate() + dayOffset - 1) / 7) + 1;
+
+            const days = ['日', '月', '火', '水', '木', '金', '土'];
+            const formatWithDay = (d) => {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const date = String(d.getDate()).padStart(2, '0');
+                return `${y}/${m}/${date} (${days[d.getDay()]})`;
+            };
+
+            return {
+                title: `${year}年 ${month}月 第${weekNum}週`,
+                range: `${formatWithDay(mon)} ～ ${formatWithDay(sun)}`
+            };
+        }
+
         function getRankBadge(status) {
             switch(status) {
                 case '契約':
@@ -930,46 +999,37 @@
             }
         }
 
-        function formatDateStr(date) {
-            const y = date.getFullYear();
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const d = String(date.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
+        function getStatusBadgeHTML(status) {
+            let colorClasses = '';
+            switch(status) {
+                case 'アプローチ中':
+                    colorClasses = 'bg-sky-50 text-sky-800 border-sky-300';
+                    break;
+                case '提案・商談中':
+                    colorClasses = 'bg-amber-50 text-amber-800 border-amber-300';
+                    break;
+                case '見積提出':
+                    colorClasses = 'bg-indigo-50 text-indigo-800 border-indigo-300';
+                    break;
+                case '受注見込':
+                    colorClasses = 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold';
+                    break;
+                case '契約':
+                    colorClasses = 'bg-teal-50 text-teal-800 border-teal-300 font-bold';
+                    break;
+                case '完了':
+                    colorClasses = 'bg-cyan-50 text-cyan-900 border-cyan-300 font-bold';
+                    break;
+                case '失注':
+                    colorClasses = 'bg-rose-50 text-rose-800 border-rose-300';
+                    break;
+                default:
+                    colorClasses = 'bg-solid-100 text-solid-800 border-solid-300';
+            }
+            return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border status-badge ${colorClasses}">${escapeHTML(status)}</span>`;
         }
 
-        function getMondayOfDate(d) {
-            const date = new Date(d);
-            const day = date.getDay();
-            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-            return new Date(date.setDate(diff));
-        }
-
-        function getWeekInfo(mondayStr) {
-            const mon = new Date(mondayStr + 'T00:00:00');
-            const sun = new Date(mon);
-            sun.setDate(sun.getDate() + 6);
-
-            const year = mon.getFullYear();
-            const month = mon.getMonth() + 1;
-
-            const firstDay = new Date(year, mon.getMonth(), 1);
-            const dayOffset = (firstDay.getDay() + 6) % 7;
-            const weekNum = Math.floor((mon.getDate() + dayOffset - 1) / 7) + 1;
-
-            const days = ['日', '月', '火', '水', '木', '金', '土'];
-            const formatWithDay = (d) => {
-                const y = d.getFullYear();
-                const m = String(d.getMonth() + 1).padStart(2, '0');
-                const date = String(d.getDate()).padStart(2, '0');
-                return `${y}/${m}/${date} (${days[d.getDay()]})`;
-            };
-
-            return {
-                title: `${year}年 ${month}月 第${weekNum}週`,
-                range: `${formatWithDay(mon)} ～ ${formatWithDay(sun)}`
-            };
-        }
-
+        // --- 2. GLOBAL STATE INITIALIZATION ---
         const initialMonday = getMondayOfDate(new Date());
         const initialMondayStr = formatDateStr(initialMonday);
 
@@ -986,15 +1046,11 @@
             sortDirection: 'asc'
         };
 
-        let pendingRestoreData = null;
-        let statusChartInstance = null;
-
-        // --- LOCAL INDEXEDDB & FILE SYSTEM AUTO-SAVE STORAGE ---
-        const IDB_NAME = 'SalesActivityManagementDB';
-        const IDB_STORE = 'app_storage';
         let currentFileHandle = null;
         let currentFileName = null;
         let autoSaveTimer = null;
+        let pendingRestoreData = null;
+        let statusChartInstance = null;
 
         function openIndexedDB() {
             return new Promise((resolve, reject) => {
@@ -1030,6 +1086,29 @@
             } catch (err) {
                 return null;
             }
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toastNotification');
+            const msgEl = document.getElementById('toastMessage');
+            const iconEl = document.getElementById('toastIcon');
+
+            if (!toast || !msgEl || !iconEl) return;
+
+            msgEl.innerText = message;
+            if (isError) {
+                iconEl.className = 'fa-solid fa-circle-exclamation text-rose-400 text-xs';
+            } else {
+                iconEl.className = 'fa-solid fa-check text-emerald-400 text-xs';
+            }
+
+            toast.classList.remove('translate-y-[-10px]', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-10px]', 'opacity-0', 'pointer-events-none');
+            }, 2500);
         }
 
         function updateSaveStatusUI(status, label = null) {
@@ -1086,7 +1165,6 @@
             }
         }
 
-        // Auto Save Routine: Writes to IndexedDB always AND automatically overwrites previous file handle
         async function executeAutoSave(showFeedbackToast = false) {
             updateSaveStatusUI('saving');
 
@@ -1097,10 +1175,8 @@
             };
             const jsonString = JSON.stringify(exportPayload, null, 2);
 
-            // 1. Always save to local browser persistent storage (Zero data loss upon refresh)
             await idbSet('latest_app_state', exportPayload);
 
-            // 2. Overwrite the previously chosen file if handle exists
             if (currentFileHandle) {
                 try {
                     const permissionOpts = { mode: 'readwrite' };
@@ -1128,7 +1204,6 @@
             if (showFeedbackToast) showToast('データを内部保存しました');
         }
 
-        // Trigger with brief debounce so multiple rapid edits don't choke the disk
         function triggerAutoSave(immediate = false) {
             if (autoSaveTimer) clearTimeout(autoSaveTimer);
             if (immediate) {
@@ -1140,7 +1215,6 @@
             }
         }
 
-        // Explicitly choose or change the target file to auto-overwrite
         async function chooseSaveFileLocation() {
             const now = new Date();
             const y = now.getFullYear();
@@ -1162,11 +1236,9 @@
                     currentFileHandle = handle;
                     currentFileName = handle.name;
 
-                    // Save handle reference to IndexedDB for subsequent page visits
                     await idbSet('saved_file_handle', handle);
                     await idbSet('saved_file_name', handle.name);
 
-                    // Immediately write current state to the chosen file
                     await executeAutoSave(true);
                     updateSaveStatusUI('saved', `保存先: ${currentFileName} (自動上書き有効)`);
                     return;
@@ -1176,11 +1248,9 @@
                 }
             }
 
-            // Fallback for browsers without File System Access API: trigger JSON download
             saveDataToFile();
         }
 
-        // Manual reconnect button if user reloaded and browser requires user-gesture for disk write
         async function reconnectLastFileHandle() {
             if (!currentFileHandle) return;
             try {
@@ -1198,10 +1268,8 @@
             }
         }
 
-        // Initialize state on page load: restore from IndexedDB if exists
         async function restoreStateFromPersistence() {
             try {
-                // 1. Restore actual app state (data never wiped upon refresh)
                 const storedPayload = await idbGet('latest_app_state');
                 if (storedPayload && storedPayload.appState && storedPayload.appState.weeks) {
                     const s = storedPayload.appState;
@@ -1212,7 +1280,6 @@
                     }
                 }
 
-                // 2. Restore file handle reference
                 const storedHandle = await idbGet('saved_file_handle');
                 const storedName = await idbGet('saved_file_name');
 
@@ -1220,7 +1287,6 @@
                     currentFileHandle = storedHandle;
                     currentFileName = storedName;
 
-                    // Test permission
                     const perm = await currentFileHandle.queryPermission({ mode: 'readwrite' });
                     if (perm === 'granted') {
                         updateSaveStatusUI('saved', `保存先: ${currentFileName} (自動上書き中)`);
@@ -1238,50 +1304,55 @@
             }
         }
 
-        window.onload = function() {
-            restoreStateFromPersistence();
-            switchView('table');
-        };
-
         function toggleMobileSidebar(forceState) {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('mobileBackdrop');
+            if (!sidebar) return;
             const isCurrentlyHidden = sidebar.classList.contains('-translate-x-full');
 
             const shouldOpen = typeof forceState === 'boolean' ? forceState : isCurrentlyHidden;
 
             if (shouldOpen) {
                 sidebar.classList.remove('-translate-x-full');
-                backdrop.classList.remove('hidden');
+                if (backdrop) backdrop.classList.remove('hidden');
             } else {
                 sidebar.classList.add('-translate-x-full');
-                backdrop.classList.add('hidden');
+                if (backdrop) backdrop.classList.add('hidden');
             }
         }
 
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toastNotification');
-            const msgEl = document.getElementById('toastMessage');
-            const iconEl = document.getElementById('toastIcon');
+        function toggleConcernResolved(recordId, isResolved) {
+            let targetRecord = null;
+            for (const wKey in appState.weeks) {
+                const found = (appState.weeks[wKey].records || []).find(r => String(r.id) === String(recordId));
+                if (found) {
+                    targetRecord = found;
+                    break;
+                }
+            }
 
-            msgEl.innerText = message;
-            if (isError) {
-                iconEl.className = 'fa-solid fa-circle-exclamation text-rose-400 text-xs';
+            if (!targetRecord) return;
+
+            targetRecord.concernsResolved = !!isResolved;
+            if (isResolved) {
+                targetRecord.concernsResolvedAt = new Date().toISOString();
+                showToast(`「${targetRecord.title}」の懸念事項を解決済みに設定しました`);
             } else {
-                iconEl.className = 'fa-solid fa-check text-emerald-400 text-xs';
+                targetRecord.concernsResolved = false;
+                delete targetRecord.concernsResolvedAt;
+                showToast(`「${targetRecord.title}」の懸念事項を未解決に戻しました`);
             }
 
-            toast.classList.remove('translate-y-[-10px]', 'opacity-0', 'pointer-events-none');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-[-10px]', 'opacity-0', 'pointer-events-none');
-            }, 2500);
+            renderAll();
+            triggerAutoSave();
         }
 
-        // --- EXCEL (.XLSX) EXPORT FUNCTIONALITY ---
         function exportHistoryToExcel(targetWeekStr = null) {
+            if (typeof XLSX === 'undefined') {
+                showToast('Excel出力ライブラリを読み込めませんでした', true);
+                return;
+            }
+
             try {
                 const now = new Date();
                 const y = now.getFullYear();
@@ -1306,10 +1377,8 @@
                 }
 
                 const sheetData = [
-                    ['週', '期間', 'ランク', '担当者', '案件名', '受注計上金額(円)', '計上月', 'ステータス', '内容 (行動履歴・次回アクション)', '懸念・問題事項']
+                    ['週', '期間', 'ランク', '担当者', '案件名', '受注計上金額(円)', '計上月', 'ステータス', '内容 (行動履歴・次回アクション)', '懸念・問題事項', '懸念解決状況']
                 ];
-
-                let totalRecordCount = 0;
 
                 weekKeysToExport.forEach(wKey => {
                     const weekObj = appState.weeks[wKey];
@@ -1326,6 +1395,7 @@
                             '-',
                             '-',
                             '-',
+                            '-',
                             '-'
                         ]);
                         return;
@@ -1334,6 +1404,7 @@
                     weekObj.records.forEach(r => {
                         const rankObj = getRankBadge(r.status);
                         const amt = Number(r.amount) || 0;
+                        const concernStatusText = r.concerns ? (r.concernsResolved ? '解決済み' : '未解決') : '-';
                         sheetData.push([
                             info.title,
                             info.range,
@@ -1344,25 +1415,26 @@
                             r.month || '',
                             r.status || '',
                             r.detail || '',
-                            r.concerns || ''
+                            r.concerns || '',
+                            concernStatusText
                         ]);
-                        totalRecordCount++;
                     });
                 });
 
                 const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
                 ws['!cols'] = [
-                    { wch: 18 }, // 週
-                    { wch: 30 }, // 期間
-                    { wch: 8 },  // ランク
-                    { wch: 14 }, // 担当者
-                    { wch: 28 }, // 案件名
-                    { wch: 18 }, // 受注計上金額(円)
-                    { wch: 10 }, // 計上月
-                    { wch: 14 }, // ステータス
-                    { wch: 50 }, // 内容
-                    { wch: 40 }  // 懸念・問題事項
+                    { wch: 18 },
+                    { wch: 30 },
+                    { wch: 8 },
+                    { wch: 14 },
+                    { wch: 28 },
+                    { wch: 18 },
+                    { wch: 10 },
+                    { wch: 14 },
+                    { wch: 45 },
+                    { wch: 35 },
+                    { wch: 12 }
                 ];
 
                 const wb = XLSX.utils.book_new();
@@ -1376,146 +1448,6 @@
             }
         }
 
-        // --- SALES REP MASTER MANAGEMENT ---
-        function renderRepDropdowns() {
-            const filterSelect = document.getElementById('filterRep');
-            const currentFilterVal = filterSelect.value;
-            filterSelect.innerHTML = '<option value="ALL">全員表示</option>';
-
-            const allAvailableRepsSet = new Set(appState.masterReps);
-            Object.values(appState.weeks).forEach(week => {
-                (week.records || []).forEach(r => {
-                    if (r.rep && r.rep.trim()) allAvailableRepsSet.add(r.rep.trim());
-                });
-            });
-
-            const sortedReps = Array.from(allAvailableRepsSet).sort((a, b) => a.localeCompare(b, 'ja'));
-
-            sortedReps.forEach(rep => {
-                filterSelect.innerHTML += `<option value="${rep}">${rep}</option>`;
-            });
-
-            if (currentFilterVal && (currentFilterVal === 'ALL' || allAvailableRepsSet.has(currentFilterVal))) {
-                filterSelect.value = currentFilterVal;
-            }
-
-            const modalSelect = document.getElementById('modalRep');
-            const currentModalVal = modalSelect.value;
-            modalSelect.innerHTML = '<option value="">担当者を選択してください</option>';
-
-            appState.masterReps.forEach(rep => {
-                modalSelect.innerHTML += `<option value="${rep}">${rep}</option>`;
-            });
-
-            if (currentModalVal && appState.masterReps.includes(currentModalVal)) {
-                modalSelect.value = currentModalVal;
-            }
-        }
-
-        function openRepManageModal() {
-            renderRepManageList();
-            document.getElementById('newRepInput').value = '';
-            document.getElementById('repManageModal').classList.remove('hidden');
-        }
-
-        function closeRepManageModal() {
-            document.getElementById('repManageModal').classList.add('hidden');
-            renderRepDropdowns();
-            renderTable();
-        }
-
-        function renderRepManageList() {
-            const listEl = document.getElementById('repManageList');
-            const countEl = document.getElementById('repManageCount');
-            countEl.innerText = `全 ${appState.masterReps.length} 名`;
-
-            if (appState.masterReps.length === 0) {
-                listEl.innerHTML = '<p class="text-xs text-solid-400 py-3 text-center italic">登録されている担当者がいません</p>';
-                return;
-            }
-
-            listEl.innerHTML = appState.masterReps.map((rep, idx) => `
-                <div class="flex items-center justify-between p-2 rounded bg-solid-50 border border-solid-200 text-xs">
-                    <div class="flex items-center space-x-2">
-                        <span class="w-5 h-5 rounded bg-solid-200 text-solid-700 font-bold text-[10px] flex items-center justify-center">
-                            ${idx + 1}
-                        </span>
-                        <span class="font-bold text-solid-900">${rep}</span>
-                    </div>
-                    <div class="flex items-center space-x-1">
-                        <button type="button" onclick="editRepName(${idx})" class="px-2 py-1 bg-white hover:bg-solid-100 text-solid-600 rounded border border-solid-300 text-[11px] font-semibold" title="名前を変更">
-                            編集
-                        </button>
-                        <button type="button" onclick="deleteRep(${idx})" class="px-2 py-1 bg-white hover:bg-rose-50 text-rose-600 rounded border border-solid-300 text-[11px] font-semibold" title="リストから削除">
-                            削除
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function handleAddNewRep(e) {
-            e.preventDefault();
-            const input = document.getElementById('newRepInput');
-            const name = input.value.trim();
-
-            if (!name) return;
-
-            if (appState.masterReps.includes(name)) {
-                showToast('既に同名の担当者が登録されています', true);
-                return;
-            }
-
-            appState.masterReps.push(name);
-            input.value = '';
-            renderRepManageList();
-            renderRepDropdowns();
-            triggerAutoSave();
-            showToast(`担当者「${name}」を追加しました`);
-        }
-
-        function editRepName(index) {
-            const oldName = appState.masterReps[index];
-            const newName = prompt(`担当者名を変更してください:`, oldName);
-
-            if (!newName || !newName.trim() || newName.trim() === oldName) return;
-
-            const trimmedNew = newName.trim();
-            if (appState.masterReps.includes(trimmedNew) && trimmedNew !== oldName) {
-                showToast('既に同名の担当者が存在します', true);
-                return;
-            }
-
-            appState.masterReps[index] = trimmedNew;
-
-            Object.values(appState.weeks).forEach(w => {
-                (w.records || []).forEach(r => {
-                    if (r.rep === oldName) r.rep = trimmedNew;
-                });
-            });
-
-            renderRepManageList();
-            renderRepDropdowns();
-            renderAll();
-            triggerAutoSave();
-            showToast(`担当者名を「${trimmedNew}」に更新しました`);
-        }
-
-        function deleteRep(index) {
-            const repName = appState.masterReps[index];
-            if (!confirm(`担当者「${repName}」をリストから削除しますか？\n※既存の登録済み案件データは保持されます。`)) {
-                return;
-            }
-
-            appState.masterReps.splice(index, 1);
-            renderRepManageList();
-            renderRepDropdowns();
-            renderAll();
-            triggerAutoSave();
-            showToast(`担当者「${repName}」を削除しました`);
-        }
-
-        // --- MANUAL FILE BACKUP DOWNLOAD (Standard Fallback) ---
         async function saveDataToFile() {
             const now = new Date();
             const y = now.getFullYear();
@@ -1575,18 +1507,26 @@
             }
 
             const fileInput = document.getElementById('fallbackFileInput');
-            fileInput.value = '';
-            fileInput.click();
+            if (fileInput) {
+                fileInput.value = '';
+                fileInput.click();
+            }
         }
 
         function handleFallbackFileSelected(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            currentFileName = file.name;
+            // Normal file input cannot write back automatically
+            currentFileHandle = null;
+            currentFileName = null;
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 parseAndConfirmRestore(e.target.result);
+            };
+            reader.onerror = function() {
+                showToast('ファイルの読み込みに失敗しました', true);
             };
             reader.readAsText(file);
         }
@@ -1612,12 +1552,16 @@
                     totalRecords += (w.records || []).length;
                 });
 
-                document.getElementById('restoreModalSummary').innerHTML = `
-                    読み込み対象: <strong class="text-solid-900">${weekCount} 週分</strong>（登録案件合計: <strong class="text-solid-900">${totalRecords} 件</strong>）<br>
-                    現在の管理データがすべて上書きされます。よろしいですか？
-                `;
+                const summaryEl = document.getElementById('restoreModalSummary');
+                if (summaryEl) {
+                    summaryEl.innerHTML = `
+                        読み込み対象: <strong class="text-solid-900">${weekCount} 週分</strong>（登録案件合計: <strong class="text-solid-900">${totalRecords} 件</strong>）<br>
+                        現在の管理データがすべて上書きされます。よろしいですか？
+                    `;
+                }
 
-                document.getElementById('confirmRestoreModal').classList.remove('hidden');
+                const modal = document.getElementById('confirmRestoreModal');
+                if (modal) modal.classList.remove('hidden');
             } catch (err) {
                 console.error('File parsing error:', err);
                 showToast('有効なJSONデータファイルを指定してください', true);
@@ -1625,7 +1569,8 @@
         }
 
         function closeRestoreModal() {
-            document.getElementById('confirmRestoreModal').classList.add('hidden');
+            const modal = document.getElementById('confirmRestoreModal');
+            if (modal) modal.classList.add('hidden');
             pendingRestoreData = null;
         }
 
@@ -1655,41 +1600,349 @@
             showToast('データを正常に復元しました');
         }
 
-        function renderAll() {
-            renderRepDropdowns();
-            updateWeekHeaderAndDropdown();
-            renderKPIs();
-            renderTable();
-            renderAnalytics();
-            renderHistory();
+        function renderRepDropdowns() {
+            const filterSelect = document.getElementById('filterRep');
+            const currentFilterVal = filterSelect ? filterSelect.value : 'ALL';
+            if (filterSelect) filterSelect.innerHTML = '<option value="ALL">全員表示</option>';
+
+            const allAvailableRepsSet = new Set(appState.masterReps);
+            Object.values(appState.weeks).forEach(week => {
+                (week.records || []).forEach(r => {
+                    if (r.rep && r.rep.trim()) allAvailableRepsSet.add(r.rep.trim());
+                });
+            });
+
+            const sortedReps = Array.from(allAvailableRepsSet).sort((a, b) => a.localeCompare(b, 'ja'));
+
+            sortedReps.forEach(rep => {
+                if (filterSelect) filterSelect.innerHTML += `<option value="${escapeHTML(rep)}">${escapeHTML(rep)}</option>`;
+            });
+
+            if (filterSelect && currentFilterVal && (currentFilterVal === 'ALL' || allAvailableRepsSet.has(currentFilterVal))) {
+                filterSelect.value = currentFilterVal;
+            }
+
+            const modalSelect = document.getElementById('modalRep');
+            const currentModalVal = modalSelect ? modalSelect.value : '';
+            if (modalSelect) modalSelect.innerHTML = '<option value="">担当者を選択してください</option>';
+
+            appState.masterReps.forEach(rep => {
+                if (modalSelect) modalSelect.innerHTML += `<option value="${escapeHTML(rep)}">${escapeHTML(rep)}</option>`;
+            });
+
+            if (modalSelect && currentModalVal && appState.masterReps.includes(currentModalVal)) {
+                modalSelect.value = currentModalVal;
+            }
         }
 
-        function updateWeekHeaderAndDropdown() {
-            const currentMonStr = appState.currentWeekMondayStr;
-            const info = getWeekInfo(currentMonStr);
+        function openRepManageModal() {
+            renderRepManageList();
+            const input = document.getElementById('newRepInput');
+            if (input) input.value = '';
+            const modal = document.getElementById('repManageModal');
+            if (modal) modal.classList.remove('hidden');
+        }
 
-            document.getElementById('analyticsWeekTitle').innerText = info.title;
-            document.getElementById('analyticsWeekRange').innerHTML = `<i class="fa-regular fa-calendar mr-1 opacity-80"></i><span>${info.range}</span>`;
-            document.getElementById('tableWeekTitle').innerText = info.title;
-            document.getElementById('tableWeekRange').innerHTML = `<i class="fa-regular fa-calendar mr-1 opacity-80"></i><span>${info.range}</span>`;
+        function closeRepManageModal() {
+            const modal = document.getElementById('repManageModal');
+            if (modal) modal.classList.add('hidden');
+            renderRepDropdowns();
+            renderTable();
+        }
 
-            const dropdown = document.getElementById('weekSelectDropdown');
-            const tableDropdown = document.getElementById('tableWeekSelectDropdown');
-            dropdown.innerHTML = '';
-            tableDropdown.innerHTML = '';
+        function renderRepManageList() {
+            const listEl = document.getElementById('repManageList');
+            const countEl = document.getElementById('repManageCount');
+            if (countEl) countEl.innerText = `全 ${appState.masterReps.length} 名`;
 
-            const sortedWeekKeys = Object.keys(appState.weeks).sort().reverse();
-            sortedWeekKeys.forEach(wKey => {
-                const wInfo = getWeekInfo(wKey);
-                const selectedAttr = wKey === currentMonStr ? 'selected' : '';
-                const optHtml = `<option value="${wKey}" ${selectedAttr}>${wInfo.title} (${wKey})</option>`;
-                dropdown.innerHTML += optHtml;
-                tableDropdown.innerHTML += optHtml;
+            if (!listEl) return;
+
+            if (appState.masterReps.length === 0) {
+                listEl.innerHTML = '<p class="text-xs text-solid-400 py-3 text-center italic">登録されている担当者がいません</p>';
+                return;
+            }
+
+            listEl.innerHTML = appState.masterReps.map((rep, idx) => `
+                <div class="flex items-center justify-between p-2 rounded bg-solid-50 border border-solid-200 text-xs">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-5 h-5 rounded bg-solid-200 text-solid-700 font-bold text-[10px] flex items-center justify-center">
+                            ${idx + 1}
+                        </span>
+                        <span class="font-bold text-solid-900">${escapeHTML(rep)}</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button type="button" onclick="editRepName(${idx})" class="px-2 py-1 bg-white hover:bg-solid-100 text-solid-600 rounded border border-solid-300 text-[11px] font-semibold" title="名前を変更">
+                            編集
+                        </button>
+                        <button type="button" onclick="deleteRep(${idx})" class="px-2 py-1 bg-white hover:bg-rose-50 text-rose-600 rounded border border-solid-300 text-[11px] font-semibold" title="リストから削除">
+                            削除
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleAddNewRep(e) {
+            e.preventDefault();
+            const input = document.getElementById('newRepInput');
+            const name = input ? input.value.trim() : '';
+
+            if (!name) return;
+
+            if (appState.masterReps.includes(name)) {
+                showToast('既に同名の担当者が登録されています', true);
+                return;
+            }
+
+            appState.masterReps.push(name);
+            if (input) input.value = '';
+            renderRepManageList();
+            renderRepDropdowns();
+            triggerAutoSave();
+            showToast(`担当者「${name}」を追加しました`);
+        }
+
+        function editRepName(index) {
+            const oldName = appState.masterReps[index];
+            const newName = prompt(`担当者名を変更してください:`, oldName);
+
+            if (!newName || !newName.trim() || newName.trim() === oldName) return;
+
+            const trimmedNew = newName.trim();
+            if (appState.masterReps.includes(trimmedNew) && trimmedNew !== oldName) {
+                showToast('既に同名の担当者が存在します', true);
+                return;
+            }
+
+            appState.masterReps[index] = trimmedNew;
+
+            Object.values(appState.weeks).forEach(w => {
+                (w.records || []).forEach(r => {
+                    if (r.rep === oldName) r.rep = trimmedNew;
+                });
             });
+
+            renderRepManageList();
+            renderRepDropdowns();
+            renderAll();
+            triggerAutoSave();
+            showToast(`担当者名を「${trimmedNew}」に更新しました`);
+        }
+
+        function deleteRep(index) {
+            const repName = appState.masterReps[index];
+            if (!confirm(`担当者「${repName}」をリストから削除しますか？\n※既存の登録済み案件データは保持されます。`)) {
+                return;
+            }
+
+            appState.masterReps.splice(index, 1);
+            renderRepManageList();
+            renderRepDropdowns();
+            renderAll();
+            triggerAutoSave();
+            showToast(`担当者「${repName}」を削除しました`);
+        }
+
+        function openRecordModal(editId = null) {
+            const modal = document.getElementById('recordModal');
+            const form = document.getElementById('recordForm');
+            const titleEl = document.getElementById('recordModalTitle');
+            const resolvedWrapper = document.getElementById('modalConcernResolvedWrapper');
+            const resolvedCheck = document.getElementById('modalConcernResolved');
+
+            if (form) form.reset();
+            renderRepDropdowns();
+
+            if (editId) {
+                const records = getCurrentRecords();
+                const record = records.find(r => r.id === editId);
+                if (record) {
+                    document.getElementById('recordId').value = record.id;
+                    document.getElementById('modalRep').value = record.rep || '';
+                    document.getElementById('modalTitle').value = record.title || '';
+                    document.getElementById('modalAmount').value = record.amount && record.amount > 0 ? record.amount : '';
+                    document.getElementById('modalMonth').value = record.month || '';
+                    document.getElementById('modalStatus').value = record.status || 'アプローチ中';
+                    document.getElementById('modalDetail').value = record.detail || '';
+                    document.getElementById('modalConcerns').value = record.concerns || '';
+
+                    if (record.concerns && record.concerns.trim()) {
+                        if (resolvedWrapper) resolvedWrapper.classList.remove('hidden');
+                        if (resolvedCheck) resolvedCheck.checked = !!record.concernsResolved;
+                    } else {
+                        if (resolvedWrapper) resolvedWrapper.classList.add('hidden');
+                        if (resolvedCheck) resolvedCheck.checked = false;
+                    }
+
+                    if (titleEl) titleEl.innerText = '案件・行動の編集';
+                }
+            } else {
+                document.getElementById('recordId').value = '';
+                document.getElementById('modalAmount').value = '';
+                document.getElementById('modalMonth').value = '';
+                document.getElementById('modalConcerns').value = '';
+                if (resolvedWrapper) resolvedWrapper.classList.add('hidden');
+                if (resolvedCheck) resolvedCheck.checked = false;
+                if (titleEl) titleEl.innerText = '案件・行動の追加';
+            }
+
+            toggleAccountingMonthVisibility();
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeRecordModal() {
+            const modal = document.getElementById('recordModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handleSaveRecord(e) {
+            e.preventDefault();
+            const recordId = document.getElementById('recordId').value;
+            const rep = document.getElementById('modalRep').value.trim();
+            const title = document.getElementById('modalTitle').value.trim();
+            const amount = Number(document.getElementById('modalAmount').value) || 0;
+            const month = amount > 0 ? document.getElementById('modalMonth').value : '';
+            const status = document.getElementById('modalStatus').value;
+            const detail = document.getElementById('modalDetail').value.trim();
+            const concerns = document.getElementById('modalConcerns').value.trim();
+            const concernsResolvedCheck = document.getElementById('modalConcernResolved');
+            const concernsResolved = concerns && concernsResolvedCheck ? concernsResolvedCheck.checked : false;
+
+            if (!rep) {
+                showToast('担当者を選択してください', true);
+                return;
+            }
+
+            const records = getCurrentRecords();
+
+            if (recordId) {
+                const index = records.findIndex(r => r.id === recordId);
+                if (index !== -1) {
+                    records[index] = { 
+                        ...records[index],
+                        id: recordId, 
+                        rep, 
+                        title, 
+                        amount, 
+                        month, 
+                        status, 
+                        detail, 
+                        concerns,
+                        concernsResolved: concernsResolved,
+                        concernsResolvedAt: concernsResolved ? (records[index].concernsResolvedAt || new Date().toISOString()) : null
+                    };
+                }
+            } else {
+                const newRecord = {
+                    id: 'rec-' + Date.now(),
+                    rep,
+                    title,
+                    amount,
+                    month,
+                    status,
+                    detail,
+                    concerns,
+                    concernsResolved: false
+                };
+                records.push(newRecord);
+            }
+
+            closeRecordModal();
+            renderAll();
+            triggerAutoSave();
+        }
+
+        function deleteRecord(id) {
+            const records = getCurrentRecords();
+            const index = records.findIndex(r => r.id === id);
+            if (index !== -1) {
+                records.splice(index, 1);
+                renderAll();
+                triggerAutoSave();
+            }
+        }
+
+        function openNewWeekModal() {
+            const curMon = parseLocalDate(appState.currentWeekMondayStr) || new Date();
+            curMon.setDate(curMon.getDate() + 7);
+            const dateInput = document.getElementById('newWeekStartDate');
+            if (dateInput) dateInput.value = formatDateStr(curMon);
+            const modal = document.getElementById('newWeekModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeNewWeekModal() {
+            const modal = document.getElementById('newWeekModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handleCreateNewWeek(e) {
+            e.preventDefault();
+            const inputDateValue = document.getElementById('newWeekStartDate').value;
+            const inputDate = parseLocalDate(inputDateValue);
+
+            if (!inputDate) {
+                showToast('有効な開始日を入力してください', true);
+                return;
+            }
+
+            const monStr = formatDateStr(getMondayOfDate(inputDate));
+            const carryOver = document.getElementById('carryOverUnfinished').checked;
+
+            if (!appState.weeks[monStr]) {
+                appState.weeks[monStr] = {
+                    mondayStr: monStr,
+                    records: []
+                };
+            }
+
+            if (carryOver) {
+                const sourceRecords = getCurrentRecords();
+                const unfinished = sourceRecords.filter(r => r.status !== '契約' && r.status !== '失注' && r.status !== '完了');
+
+                unfinished.forEach(r => {
+                    const carriedConcern = r.concernsResolved ? '' : (r.concerns || '');
+                    appState.weeks[monStr].records.push({
+                        id: 'rec-' + Date.now() + Math.floor(Math.random() * 1000),
+                        rep: r.rep,
+                        title: r.title,
+                        amount: r.amount || 0,
+                        month: r.month || '',
+                        status: r.status,
+                        detail: `[前週より引継ぎ] ${r.detail}`,
+                        concerns: carriedConcern,
+                        concernsResolved: false
+                    });
+                });
+            }
+
+            appState.currentWeekMondayStr = monStr;
+            closeNewWeekModal();
+            renderAll();
+            triggerAutoSave();
+        }
+
+        function toggleSort(key) {
+            if (appState.sortKey === key) {
+                appState.sortDirection = appState.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                appState.sortKey = key;
+                appState.sortDirection = (key === 'amount') ? 'desc' : 'asc';
+            }
+            syncSortDropdown();
+            renderTable();
+        }
+
+        function onSortDropdownChange(val) {
+            const [key, dir] = val.split('_');
+            appState.sortKey = key;
+            appState.sortDirection = dir || 'asc';
+            updateSortHeaderIcons();
+            renderTable();
         }
 
         function navigateWeek(direction) {
-            const curMon = new Date(appState.currentWeekMondayStr);
+            const curMon = parseLocalDate(appState.currentWeekMondayStr) || new Date();
             curMon.setDate(curMon.getDate() + (direction * 7));
             const targetMonStr = formatDateStr(curMon);
 
@@ -1724,66 +1977,6 @@
             triggerAutoSave();
         }
 
-        function getCurrentRecords() {
-            const w = appState.weeks[appState.currentWeekMondayStr];
-            return w ? w.records : [];
-        }
-
-        function renderKPIs() {
-            const records = getCurrentRecords();
-            document.getElementById('kpiTotalCount').innerText = records.length;
-
-            const counts = {
-                'アプローチ中': 0,
-                '提案・商談中': 0,
-                '見積提出': 0,
-                '受注見込': 0,
-                '契約': 0,
-                '完了': 0
-            };
-
-            records.forEach(r => {
-                if (counts[r.status] !== undefined) {
-                    counts[r.status]++;
-                }
-            });
-
-            document.getElementById('kpiApproachCount').innerText = counts['アプローチ中'];
-            document.getElementById('kpiProposalCount').innerText = counts['提案・商談中'];
-            document.getElementById('kpiEstimateCount').innerText = counts['見積提出'];
-            document.getElementById('kpiExpectedCount').innerText = counts['受注見込'];
-        }
-
-        function getStatusBadgeHTML(status) {
-            let colorClasses = '';
-            switch(status) {
-                case 'アプローチ中':
-                    colorClasses = 'bg-sky-50 text-sky-800 border-sky-300';
-                    break;
-                case '提案・商談中':
-                    colorClasses = 'bg-amber-50 text-amber-800 border-amber-300';
-                    break;
-                case '見積提出':
-                    colorClasses = 'bg-indigo-50 text-indigo-800 border-indigo-300';
-                    break;
-                case '受注見込':
-                    colorClasses = 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold';
-                    break;
-                case '契約':
-                    colorClasses = 'bg-teal-50 text-teal-800 border-teal-300 font-bold';
-                    break;
-                case '完了':
-                    colorClasses = 'bg-cyan-50 text-cyan-900 border-cyan-300 font-bold';
-                    break;
-                case '失注':
-                    colorClasses = 'bg-rose-50 text-rose-800 border-rose-300';
-                    break;
-                default:
-                    colorClasses = 'bg-solid-100 text-solid-800 border-solid-300';
-            }
-            return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border status-badge ${colorClasses}">${status}</span>`;
-        }
-
         function toggleAccountingMonthVisibility() {
             const amountVal = document.getElementById('modalAmount').value.trim();
             const monthWrapper = document.getElementById('accountingMonthWrapper');
@@ -1799,24 +1992,42 @@
             }
         }
 
-        // --- SORTING LOGIC FOR ALL FIELDS ---
-        function toggleSort(key) {
-            if (appState.sortKey === key) {
-                appState.sortDirection = appState.sortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                appState.sortKey = key;
-                appState.sortDirection = (key === 'amount') ? 'desc' : 'asc';
+        function switchView(viewName) {
+            const tableView = document.getElementById('tableView');
+            const analyticsView = document.getElementById('analyticsView');
+            const historyView = document.getElementById('historyView');
+
+            if (tableView) tableView.classList.add('hidden');
+            if (analyticsView) analyticsView.classList.add('hidden');
+            if (historyView) historyView.classList.add('hidden');
+
+            const defaultClasses = "w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left";
+            const tabTable = document.getElementById('sideTabTable');
+            const tabAnalytics = document.getElementById('sideTabAnalytics');
+            const tabHistory = document.getElementById('sideTabHistory');
+
+            if (tabTable) tabTable.className = defaultClasses;
+            if (tabAnalytics) tabAnalytics.className = defaultClasses;
+            if (tabHistory) tabHistory.className = defaultClasses;
+
+            if (viewName === 'analytics') {
+                if (analyticsView) analyticsView.classList.remove('hidden');
+                if (tabAnalytics) tabAnalytics.className = defaultClasses + " nav-item-active";
+                renderAnalytics();
+            } else if (viewName === 'table') {
+                if (tableView) tableView.classList.remove('hidden');
+                if (tabTable) tabTable.className = defaultClasses + " nav-item-active";
+                renderTable();
+            } else if (viewName === 'history') {
+                if (historyView) historyView.classList.remove('hidden');
+                if (tabHistory) tabHistory.className = defaultClasses + " nav-item-active";
+                renderHistory();
             }
-            syncSortDropdown();
-            renderTable();
         }
 
-        function onSortDropdownChange(val) {
-            const [key, dir] = val.split('_');
-            appState.sortKey = key;
-            appState.sortDirection = dir || 'asc';
-            updateSortHeaderIcons();
-            renderTable();
+        function getCurrentRecords() {
+            const w = appState.weeks[appState.currentWeekMondayStr];
+            return w ? w.records : [];
         }
 
         function syncSortDropdown() {
@@ -1859,31 +2070,34 @@
 
             const tbody = document.getElementById('actionTableBody');
             const emptyState = document.getElementById('tableEmptyState');
+            if (!tbody) return;
 
-            const filterRep = document.getElementById('filterRep').value;
-            const filterStatus = document.getElementById('filterStatus').value;
-            const filterSearch = document.getElementById('filterSearch').value.toLowerCase().trim();
+            const filterRep = document.getElementById('filterRep');
+            const filterStatus = document.getElementById('filterStatus');
+            const filterSearch = document.getElementById('filterSearch');
+
+            const filterRepVal = filterRep ? filterRep.value : 'ALL';
+            const filterStatusVal = filterStatus ? filterStatus.value : 'ALL';
+            const filterSearchVal = filterSearch ? filterSearch.value.toLowerCase().trim() : '';
 
             const records = [...getCurrentRecords()];
 
-            // 1. Filtering
             let filtered = records.filter(r => {
-                if (filterRep !== 'ALL' && r.rep !== filterRep) return false;
-                if (filterStatus !== 'ALL' && r.status !== filterStatus) return false;
-                if (filterSearch) {
-                    const matchTitle = (r.title || '').toLowerCase().includes(filterSearch);
-                    const matchDetail = (r.detail || '').toLowerCase().includes(filterSearch);
-                    const matchConcerns = (r.concerns || '').toLowerCase().includes(filterSearch);
-                    const matchRep = (r.rep || '').toLowerCase().includes(filterSearch);
-                    const matchMonth = (r.month || '').toLowerCase().includes(filterSearch);
+                if (filterRepVal !== 'ALL' && r.rep !== filterRepVal) return false;
+                if (filterStatusVal !== 'ALL' && r.status !== filterStatusVal) return false;
+                if (filterSearchVal) {
+                    const matchTitle = (r.title || '').toLowerCase().includes(filterSearchVal);
+                    const matchDetail = (r.detail || '').toLowerCase().includes(filterSearchVal);
+                    const matchConcerns = (r.concerns || '').toLowerCase().includes(filterSearchVal);
+                    const matchRep = (r.rep || '').toLowerCase().includes(filterSearchVal);
+                    const matchMonth = (r.month || '').toLowerCase().includes(filterSearchVal);
                     const rankObj = getRankBadge(r.status);
-                    const matchRank = rankObj.rank.toLowerCase().includes(filterSearch);
+                    const matchRank = rankObj.rank.toLowerCase().includes(filterSearchVal);
                     if (!matchTitle && !matchDetail && !matchConcerns && !matchRep && !matchMonth && !matchRank) return false;
                 }
                 return true;
             });
 
-            // 2. Sorting across all fields
             if (appState.sortKey === 'rank') {
                 filtered.sort((a, b) => {
                     const rankA = getRankBadge(a.status).rank;
@@ -1925,11 +2139,11 @@
 
             if (filtered.length === 0) {
                 tbody.innerHTML = '';
-                emptyState.classList.remove('hidden');
+                if (emptyState) emptyState.classList.remove('hidden');
                 return;
             }
 
-            emptyState.classList.add('hidden');
+            if (emptyState) emptyState.classList.add('hidden');
             let html = '';
 
             filtered.forEach(r => {
@@ -1939,7 +2153,7 @@
                 if (amtNumber > 0) {
                     const formatted = amtNumber.toLocaleString('ja-JP');
                     const monthBadge = r.month 
-                        ? `<span class="ml-1 px-1.5 py-0.2 rounded bg-solid-100 text-brand-600 border border-solid-200 text-[10px] font-bold">${r.month}計上</span>` 
+                        ? `<span class="ml-1 px-1.5 py-0.2 rounded bg-solid-100 text-brand-600 border border-solid-200 text-[10px] font-bold">${escapeHTML(r.month)}計上</span>` 
                         : '';
                     amountDisplay = `
                         <div class="flex flex-col">
@@ -1953,15 +2167,38 @@
 
                 let concernsBlock = '';
                 if (r.concerns && r.concerns.trim().length > 0) {
-                    concernsBlock = `
-                        <div class="mt-1.5 p-1.5 rounded bg-amber-50/90 border border-amber-200 text-[11px] text-amber-900 flex items-start space-x-1.5">
-                            <i class="fa-solid fa-triangle-exclamation text-amber-600 text-[10px] mt-0.5 shrink-0"></i>
-                            <div class="leading-tight">
-                                <span class="font-bold text-amber-950">懸念事項:</span>
-                                <span>${r.concerns}</span>
+                    if (r.concernsResolved) {
+                        concernsBlock = `
+                            <div class="mt-1.5 p-2 rounded bg-solid-50 border border-solid-200 text-[11px] flex items-start justify-between gap-2">
+                                <div class="flex items-start space-x-1.5 leading-tight overflow-hidden">
+                                    <span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[9px] font-bold border border-emerald-300 shrink-0 mt-0.5">解決済</span>
+                                    <div>
+                                        <span class="font-bold text-solid-700">懸念履歴:</span>
+                                        <span class="text-solid-500 line-through">${escapeHTML(r.concerns)}</span>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="toggleConcernResolved('${escapeHTML(r.id)}', false)" class="shrink-0 px-2 py-0.5 bg-white hover:bg-solid-100 text-solid-600 rounded text-[10px] font-semibold border border-solid-300 transition-colors" title="未解決に戻す">
+                                    未解決に戻す
+                                </button>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    } else {
+                        concernsBlock = `
+                            <div class="mt-1.5 p-2 rounded bg-amber-50/90 border border-amber-300 text-[11px] text-amber-950 flex items-start justify-between gap-2">
+                                <div class="flex items-start space-x-1.5 leading-tight overflow-hidden">
+                                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-[11px] mt-0.5 shrink-0"></i>
+                                    <div>
+                                        <span class="font-bold text-amber-950">懸念事項:</span>
+                                        <span>${escapeHTML(r.concerns)}</span>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="toggleConcernResolved('${escapeHTML(r.id)}', true)" class="shrink-0 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-bold border border-emerald-700 shadow-xs transition-colors flex items-center space-x-1">
+                                    <i class="fa-solid fa-check text-[9px]"></i>
+                                    <span>解決</span>
+                                </button>
+                            </div>
+                        `;
+                    }
                 }
 
                 html += `
@@ -1974,21 +2211,21 @@
                             </div>
                         </td>
                         <td class="py-2.5 px-3 font-semibold text-solid-900 whitespace-nowrap">
-                            ${r.rep}
+                            ${escapeHTML(r.rep)}
                         </td>
-                        <td class="py-2.5 px-3 font-semibold text-solid-900">${r.title}</td>
+                        <td class="py-2.5 px-3 font-semibold text-solid-900">${escapeHTML(r.title)}</td>
                         <td class="py-2.5 px-3 text-xs">${amountDisplay}</td>
                         <td class="py-2.5 px-3 text-solid-600 leading-relaxed text-xs">
-                            <div class="whitespace-pre-line">${r.detail}</div>
+                            <div class="whitespace-pre-line">${escapeHTML(r.detail)}</div>
                             ${concernsBlock}
                         </td>
                         <td class="py-2.5 px-3">${getStatusBadgeHTML(r.status)}</td>
                         <td class="py-2.5 px-3 text-center">
                             <div class="flex items-center justify-center space-x-1.5 text-solid-400">
-                                <button onclick="openRecordModal('${r.id}')" class="p-1 hover:text-brand-500 hover:bg-solid-100 rounded transition-colors" title="編集">
+                                <button type="button" onclick="openRecordModal('${escapeHTML(r.id)}')" class="p-1 hover:text-brand-500 hover:bg-solid-100 rounded transition-colors" title="編集">
                                     <i class="fa-regular fa-pen-to-square"></i>
                                 </button>
-                                <button onclick="deleteRecord('${r.id}')" class="p-1 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors" title="削除">
+                                <button type="button" onclick="deleteRecord('${escapeHTML(r.id)}')" class="p-1 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors" title="削除">
                                     <i class="fa-regular fa-trash-can"></i>
                                 </button>
                             </div>
@@ -2000,148 +2237,23 @@
             tbody.innerHTML = html;
         }
 
-        function openRecordModal(editId = null) {
-            const modal = document.getElementById('recordModal');
-            const form = document.getElementById('recordForm');
-            const titleEl = document.getElementById('recordModalTitle');
-
-            form.reset();
-            renderRepDropdowns();
-
-            if (editId) {
-                const records = getCurrentRecords();
-                const record = records.find(r => r.id === editId);
-                if (record) {
-                    document.getElementById('recordId').value = record.id;
-                    document.getElementById('modalRep').value = record.rep || '';
-                    document.getElementById('modalTitle').value = record.title || '';
-                    document.getElementById('modalAmount').value = record.amount && record.amount > 0 ? record.amount : '';
-                    document.getElementById('modalMonth').value = record.month || '';
-                    document.getElementById('modalStatus').value = record.status || 'アプローチ中';
-                    document.getElementById('modalDetail').value = record.detail || '';
-                    document.getElementById('modalConcerns').value = record.concerns || '';
-                    titleEl.innerText = '案件・行動の編集';
-                }
-            } else {
-                document.getElementById('recordId').value = '';
-                document.getElementById('modalAmount').value = '';
-                document.getElementById('modalMonth').value = '';
-                document.getElementById('modalConcerns').value = '';
-                titleEl.innerText = '案件・行動の追加';
-            }
-
-            toggleAccountingMonthVisibility();
-            modal.classList.remove('hidden');
-        }
-
-        function closeRecordModal() {
-            document.getElementById('recordModal').classList.add('hidden');
-        }
-
-        function handleSaveRecord(e) {
-            e.preventDefault();
-            const recordId = document.getElementById('recordId').value;
-            const rep = document.getElementById('modalRep').value.trim();
-            const title = document.getElementById('modalTitle').value.trim();
-            const amount = Number(document.getElementById('modalAmount').value) || 0;
-            const month = amount > 0 ? document.getElementById('modalMonth').value : '';
-            const status = document.getElementById('modalStatus').value;
-            const detail = document.getElementById('modalDetail').value.trim();
-            const concerns = document.getElementById('modalConcerns').value.trim();
-
-            if (!rep) {
-                showToast('担当者を選択してください', true);
-                return;
-            }
-
-            const records = getCurrentRecords();
-
-            if (recordId) {
-                const index = records.findIndex(r => r.id === recordId);
-                if (index !== -1) {
-                    records[index] = { id: recordId, rep, title, amount, month, status, detail, concerns };
-                }
-            } else {
-                const newRecord = {
-                    id: 'rec-' + Date.now(),
-                    rep,
-                    title,
-                    amount,
-                    month,
-                    status,
-                    detail,
-                    concerns
-                };
-                records.push(newRecord);
-            }
-
-            closeRecordModal();
-            renderAll();
-            triggerAutoSave();
-        }
-
-        function deleteRecord(id) {
-            const records = getCurrentRecords();
-            const index = records.findIndex(r => r.id === id);
-            if (index !== -1) {
-                records.splice(index, 1);
-                renderAll();
-                triggerAutoSave();
-            }
-        }
-
-        function openNewWeekModal() {
-            const curMon = new Date(appState.currentWeekMondayStr);
-            curMon.setDate(curMon.getDate() + 7);
-            document.getElementById('newWeekStartDate').value = formatDateStr(curMon);
-            document.getElementById('newWeekModal').classList.remove('hidden');
-        }
-
-        function closeNewWeekModal() {
-            document.getElementById('newWeekModal').classList.add('hidden');
-        }
-
-        function handleCreateNewWeek(e) {
-            e.preventDefault();
-            const inputDate = new Date(document.getElementById('newWeekStartDate').value);
-            const monStr = formatDateStr(getMondayOfDate(inputDate));
-            const carryOver = document.getElementById('carryOverUnfinished').checked;
-
-            if (!appState.weeks[monStr]) {
-                appState.weeks[monStr] = {
-                    mondayStr: monStr,
-                    records: []
-                };
-            }
-
-            if (carryOver) {
-                const sourceRecords = getCurrentRecords();
-                const unfinished = sourceRecords.filter(r => r.status !== '契約' && r.status !== '失注' && r.status !== '完了');
-
-                unfinished.forEach(r => {
-                    appState.weeks[monStr].records.push({
-                        id: 'rec-' + Date.now() + Math.floor(Math.random() * 1000),
-                        rep: r.rep,
-                        title: r.title,
-                        amount: r.amount || 0,
-                        month: r.month || '',
-                        status: r.status,
-                        detail: `[前週より引継ぎ] ${r.detail}`,
-                        concerns: r.concerns || ''
-                    });
-                });
-            }
-
-            appState.currentWeekMondayStr = monStr;
-            closeNewWeekModal();
-            renderAll();
-            triggerAutoSave();
-        }
-
         function renderAnalytics() {
             const records = getCurrentRecords();
 
-            // 1. Status Doughnut Chart (Solid Modern Palette)
+            // KPI elements update
+            const setKpiValue = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = String(value);
+                }
+            };
+
+            setKpiValue('kpiTotalCount', records.length);
+            setKpiValue('kpiApproachCount', records.filter(r => r.status === 'アプローチ中').length);
+            setKpiValue('kpiProposalCount', records.filter(r => r.status === '提案・商談中').length);
+            setKpiValue('kpiEstimateCount', records.filter(r => r.status === '見積提出').length);
+            setKpiValue('kpiExpectedCount', records.filter(r => r.status === '受注見込').length);
+
             const statusLabels = ['アプローチ中', '提案・商談中', '見積提出', '受注見込', '契約', '完了', '失注', '継続フォロー'];
             const statusCounts = statusLabels.map(st => records.filter(r => r.status === st).length);
             const statusColors = ['#0284c7', '#d97706', '#4f46e5', '#059669', '#0d9488', '#0891b2', '#e11d48', '#64748b'];
@@ -2149,43 +2261,45 @@
             const hasAnyData = records.length > 0;
             const displayCounts = hasAnyData ? statusCounts : [0, 0, 0, 0, 0, 0, 0, 0];
 
-            const ctxStatus = document.getElementById('statusChart').getContext('2d');
-            if (statusChartInstance) statusChartInstance.destroy();
+            const chartCanvas = document.getElementById('statusChart');
+            if (chartCanvas && typeof Chart !== 'undefined') {
+                const ctxStatus = chartCanvas.getContext('2d');
+                if (statusChartInstance) statusChartInstance.destroy();
 
-            statusChartInstance = new Chart(ctxStatus, {
-                type: 'doughnut',
-                data: {
-                    labels: statusLabels,
-                    datasets: [{
-                        data: displayCounts,
-                        backgroundColor: statusColors,
-                        borderWidth: 1,
-                        borderColor: '#ffffff',
-                        hoverOffset: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '65%',
-                    plugins: {
-                        legend: { 
-                            position: 'right',
-                            labels: {
-                                boxWidth: 10,
-                                boxHeight: 10,
-                                padding: 10,
-                                font: {
-                                    size: 10,
-                                    family: "'Noto Sans JP', sans-serif"
+                statusChartInstance = new Chart(ctxStatus, {
+                    type: 'doughnut',
+                    data: {
+                        labels: statusLabels,
+                        datasets: [{
+                            data: displayCounts,
+                            backgroundColor: statusColors,
+                            borderWidth: 1,
+                            borderColor: '#ffffff',
+                            hoverOffset: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: {
+                            legend: { 
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 10,
+                                    boxHeight: 10,
+                                    padding: 10,
+                                    font: {
+                                        size: 10,
+                                        family: "'Noto Sans JP', sans-serif"
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
 
-            // 2. Revenue & Accounting Month Analytics Summary
             let totalAmount = 0;
             const monthMap = {};
             const repRevenueMap = {};
@@ -2213,125 +2327,135 @@
             });
 
             const countWithAmount = records.filter(r => Number(r.amount || 0) > 0).length;
-            document.getElementById('analyticsTotalAmount').innerText = '¥' + totalAmount.toLocaleString('ja-JP');
-            document.getElementById('analyticsAmountDetail').innerText = `計上対象案件: ${countWithAmount} 件 (全 ${records.length} 件中)`;
+            const totalAmountEl = document.getElementById('analyticsTotalAmount');
+            if (totalAmountEl) totalAmountEl.innerText = '¥' + totalAmount.toLocaleString('ja-JP');
+            const amountDetailEl = document.getElementById('analyticsAmountDetail');
+            if (amountDetailEl) amountDetailEl.innerText = `計上対象案件: ${countWithAmount} 件 (全 ${records.length} 件中)`;
 
-            // Month breakdown
             const monthContainer = document.getElementById('analyticsMonthBreakdown');
-            const monthKeys = Object.keys(monthMap);
-
-            if (monthKeys.length === 0) {
-                monthContainer.innerHTML = '<p class="text-solid-400 italic py-1 text-xs">今週の計上金額データはありません</p>';
-            } else {
-                monthContainer.innerHTML = monthKeys.map(m => `
-                    <div class="flex items-center justify-between p-1.5 rounded bg-white border border-solid-200">
-                        <span class="font-bold text-solid-700">${m}</span>
-                        <span class="font-bold text-brand-600">¥${monthMap[m].toLocaleString('ja-JP')}</span>
-                    </div>
-                `).join('');
+            if (monthContainer) {
+                const monthKeys = Object.keys(monthMap);
+                if (monthKeys.length === 0) {
+                    monthContainer.innerHTML = '<p class="text-solid-400 italic py-1 text-xs">今週の計上金額データはありません</p>';
+                } else {
+                    monthContainer.innerHTML = monthKeys.map(m => `
+                        <div class="flex items-center justify-between p-1.5 rounded bg-white border border-solid-200">
+                            <span class="font-bold text-solid-700">${escapeHTML(m)}</span>
+                            <span class="font-bold text-brand-600">¥${monthMap[m].toLocaleString('ja-JP')}</span>
+                        </div>
+                    `).join('');
+                }
             }
 
-            // 3. Render Concerns & Problem Issues (Extracted from Reps)
             const concernsContainer = document.getElementById('concernsListContainer');
             const concernCountBadge = document.getElementById('concernCountBadge');
-            const reportedConcerns = records.filter(r => r.concerns && r.concerns.trim().length > 0);
+            const activeUnresolvedConcerns = records.filter(r => r.concerns && r.concerns.trim().length > 0 && !r.concernsResolved);
 
-            concernCountBadge.innerText = `${reportedConcerns.length}件`;
+            if (concernCountBadge) concernCountBadge.innerText = `${activeUnresolvedConcerns.length}件`;
 
-            if (reportedConcerns.length === 0) {
-                concernsContainer.innerHTML = `
-                    <div class="py-6 text-center text-solid-400 text-xs bg-solid-50 rounded border border-dashed border-solid-300">
-                        <i class="fa-regular fa-circle-check text-base text-emerald-500 mb-1"></i>
-                        <p>現在、担当者から報告された懸念・問題事項はありません。</p>
-                    </div>
-                `;
-            } else {
-                concernsContainer.innerHTML = reportedConcerns.map((r) => {
-                    const rank = getRankBadge(r.status);
-                    return `
-                        <div class="p-3 bg-white rounded border border-amber-200 shadow-xs space-y-1.5">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-2 overflow-hidden">
-                                    <span class="w-4 h-4 rounded-sm ${rank.bgClass} border flex items-center justify-center text-[9px] font-black">${rank.rank}</span>
-                                    <span class="font-bold text-solid-900 text-xs">${r.rep}</span>
-                                    <span class="text-solid-300">|</span>
-                                    <span class="font-semibold text-solid-800 text-xs truncate">${r.title}</span>
-                                </div>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
-                                    ${r.status}
-                                </span>
-                            </div>
-                            <div class="text-xs text-amber-950 font-medium bg-amber-50/70 p-2 rounded border border-amber-100 whitespace-pre-line leading-relaxed">
-                                ${r.concerns}
-                            </div>
+            if (concernsContainer) {
+                if (activeUnresolvedConcerns.length === 0) {
+                    concernsContainer.innerHTML = `
+                        <div class="py-6 text-center text-solid-400 text-xs bg-solid-50 rounded border border-dashed border-solid-300">
+                            <i class="fa-regular fa-circle-check text-base text-emerald-500 mb-1"></i>
+                            <p>現在、未解決の懸念・問題事項はありません。（すべて解決済み、または報告なし）</p>
                         </div>
                     `;
-                }).join('');
+                } else {
+                    concernsContainer.innerHTML = activeUnresolvedConcerns.map((r) => {
+                        const rank = getRankBadge(r.status);
+                        return `
+                            <div class="p-3 bg-white rounded border border-amber-300 shadow-xs space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2 overflow-hidden">
+                                        <span class="w-4 h-4 rounded-sm ${rank.bgClass} border flex items-center justify-center text-[9px] font-black">${rank.rank}</span>
+                                        <span class="font-bold text-solid-900 text-xs">${escapeHTML(r.rep)}</span>
+                                        <span class="text-solid-300">|</span>
+                                        <span class="font-semibold text-solid-800 text-xs truncate">${escapeHTML(r.title)}</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                                            ${escapeHTML(r.status)}
+                                        </span>
+                                        <button type="button" onclick="toggleConcernResolved('${escapeHTML(r.id)}', true)" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold border border-emerald-700 shadow-xs transition-colors flex items-center space-x-1" title="この課題を解決済みに設定し、週次分析から非表示にします">
+                                            <i class="fa-solid fa-check text-[10px]"></i>
+                                            <span>解決</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-amber-950 font-medium bg-amber-50/80 p-2.5 rounded border border-amber-200 whitespace-pre-line leading-relaxed">
+                                    ${escapeHTML(r.concerns)}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
             }
 
-            // 4. Render Sales Rep Revenue Breakdown (Grouped by Rep with aggregated amounts and counts)
             const repRevenueContainer = document.getElementById('repRevenueListContainer');
             const repSummaryBadge = document.getElementById('repRevenueSummaryBadge');
             const sortedRepKeys = Object.keys(repRevenueMap).sort((a, b) => repRevenueMap[b].total - repRevenueMap[a].total);
 
-            repSummaryBadge.innerText = `計上担当者: ${sortedRepKeys.length} 名`;
+            if (repSummaryBadge) repSummaryBadge.innerText = `計上担当者: ${sortedRepKeys.length} 名`;
 
-            if (sortedRepKeys.length === 0) {
-                repRevenueContainer.innerHTML = `
-                    <div class="col-span-full py-6 text-center text-solid-400 text-xs bg-solid-50 rounded border border-dashed border-solid-300">
-                        <i class="fa-regular fa-money-bill-1 text-lg text-solid-300 mb-1"></i>
-                        <p>今週売上（計上金額）を計上した担当者はまだいません。</p>
-                    </div>
-                `;
-            } else {
-                repRevenueContainer.innerHTML = sortedRepKeys.map((repName, idx) => {
-                    const repData = repRevenueMap[repName];
-                    return `
-                        <div class="bg-white p-3.5 rounded-lg border border-solid-200 shadow-xs space-y-2.5">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-2 overflow-hidden">
-                                    <div class="w-7 h-7 rounded bg-solid-800 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                                        ${repName.substring(0, 1)}
-                                    </div>
-                                    <div class="truncate">
-                                        <div class="font-bold text-solid-900 text-xs truncate">${repName}</div>
-                                        <div class="text-[10px] text-solid-500">ランク #${idx + 1}</div>
-                                    </div>
-                                </div>
-                                <span class="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-300 text-emerald-800 text-[11px] font-bold whitespace-nowrap">
-                                    計上: ${repData.count} 件
-                                </span>
-                            </div>
-
-                            <div class="bg-solid-50 p-2 rounded border border-solid-200">
-                                <div class="text-[10px] font-semibold text-solid-500">合計計上金額</div>
-                                <div class="text-base font-black text-brand-600 tracking-tight mt-0.5">
-                                    ¥${repData.total.toLocaleString('ja-JP')}
-                                </div>
-                            </div>
-
-                            <div class="space-y-1 pt-0.5">
-                                <div class="text-[10px] font-bold text-solid-600 flex items-center justify-between">
-                                    <span>計上内訳</span>
-                                    <span>${repData.count}案件</span>
-                                </div>
-                                <div class="max-h-24 overflow-y-auto custom-scrollbar space-y-1 pr-0.5">
-                                    ${repData.items.map(item => `
-                                        <div class="text-[11px] p-1.5 rounded bg-solid-50 border border-solid-200 flex items-center justify-between gap-1.5">
-                                            <div class="truncate flex-1">
-                                                <span class="font-medium text-solid-800 truncate block">${item.title}</span>
-                                                ${item.month ? `<span class="text-[9px] text-brand-600 font-bold bg-white px-1 py-0.2 rounded border border-solid-200 inline-block">${item.month}計上</span>` : ''}
-                                            </div>
-                                            <span class="font-bold text-solid-900 text-[11px] whitespace-nowrap">
-                                                ¥${item.amount.toLocaleString('ja-JP')}
-                                            </span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
+            if (repRevenueContainer) {
+                if (sortedRepKeys.length === 0) {
+                    repRevenueContainer.innerHTML = `
+                        <div class="col-span-full py-6 text-center text-solid-400 text-xs bg-solid-50 rounded border border-dashed border-solid-300">
+                            <i class="fa-regular fa-money-bill-1 text-lg text-solid-300 mb-1"></i>
+                            <p>今週売上（計上金額）を計上した担当者はまだいません。</p>
                         </div>
                     `;
-                }).join('');
+                } else {
+                    repRevenueContainer.innerHTML = sortedRepKeys.map((repName, idx) => {
+                        const repData = repRevenueMap[repName];
+                        return `
+                            <div class="bg-white p-3.5 rounded-lg border border-solid-200 shadow-xs space-y-2.5">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2 overflow-hidden">
+                                        <div class="w-7 h-7 rounded bg-solid-800 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                                            ${escapeHTML(repName.substring(0, 1))}
+                                        </div>
+                                        <div class="truncate">
+                                            <div class="font-bold text-solid-900 text-xs truncate">${escapeHTML(repName)}</div>
+                                            <div class="text-[10px] text-solid-500">ランク #${idx + 1}</div>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-300 text-emerald-800 text-[11px] font-bold whitespace-nowrap">
+                                        計上: ${repData.count} 件
+                                    </span>
+                                </div>
+
+                                <div class="bg-solid-50 p-2 rounded border border-solid-200">
+                                    <div class="text-[10px] font-semibold text-solid-500">合計計上金額</div>
+                                    <div class="text-base font-black text-brand-600 tracking-tight mt-0.5">
+                                        ¥${repData.total.toLocaleString('ja-JP')}
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1 pt-0.5">
+                                    <div class="text-[10px] font-bold text-solid-600 flex items-center justify-between">
+                                        <span>計上内訳</span>
+                                        <span>${repData.count}案件</span>
+                                    </div>
+                                    <div class="max-h-24 overflow-y-auto custom-scrollbar space-y-1 pr-0.5">
+                                        ${repData.items.map(item => `
+                                            <div class="text-[11px] p-1.5 rounded bg-solid-50 border border-solid-200 flex items-center justify-between gap-1.5">
+                                                <div class="truncate flex-1">
+                                                    <span class="font-medium text-solid-800 truncate block">${escapeHTML(item.title)}</span>
+                                                    ${item.month ? `<span class="text-[9px] text-brand-600 font-bold bg-white px-1 py-0.2 rounded border border-solid-200 inline-block">${escapeHTML(item.month)}計上</span>` : ''}
+                                                </div>
+                                                <span class="font-bold text-solid-900 text-[11px] whitespace-nowrap">
+                                                ¥${item.amount.toLocaleString('ja-JP')}
+                                                </span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
             }
         }
 
@@ -2340,7 +2464,9 @@
             const totalEl = document.getElementById('historyTotalCount');
 
             const sortedKeys = Object.keys(appState.weeks).sort().reverse();
-            totalEl.innerText = `全 ${sortedKeys.length} 週分`;
+            if (totalEl) totalEl.innerText = `全 ${sortedKeys.length} 週分`;
+
+            if (!container) return;
 
             let html = '';
 
@@ -2355,19 +2481,19 @@
                     <div class="border ${isCurrent ? 'border-brand-500 bg-brand-50/20' : 'border-solid-200 bg-white'} rounded-lg p-3.5 transition-colors">
                         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-solid-200 pb-2.5">
                             <div class="flex items-center space-x-2">
-                                <span class="font-bold text-solid-900 text-xs">${info.title}</span>
-                                <span class="text-xs text-brand-600 font-medium">(${info.range})</span>
+                                <span class="font-bold text-solid-900 text-xs">${escapeHTML(info.title)}</span>
+                                <span class="text-xs text-brand-600 font-medium">(${escapeHTML(info.range)})</span>
                                 ${isCurrent ? '<span class="bg-brand-500 text-white text-[9px] px-1.5 py-0.2 rounded font-bold">表示中</span>' : ''}
                             </div>
                             <div class="flex items-center space-x-2.5">
                                 <span class="text-xs text-solid-600">登録案件: <strong class="text-solid-900">${weekObj.records.length}</strong> 件</span>
                                 ${weekTotalAmt > 0 ? `<span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">計上総額: ¥${weekTotalAmt.toLocaleString()}</span>` : ''}
                                 
-                                <button onclick="exportHistoryToExcel('${wKey}')" class="text-xs text-emerald-700 hover:text-white font-bold flex items-center bg-emerald-50 hover:bg-emerald-600 px-2 py-1 rounded border border-emerald-300 transition-colors" title="この週のデータをExcel形式で出力">
+                                <button type="button" onclick="exportHistoryToExcel('${escapeHTML(wKey)}')" class="text-xs text-emerald-700 hover:text-white font-bold flex items-center bg-emerald-50 hover:bg-emerald-600 px-2 py-1 rounded border border-emerald-300 transition-colors" title="この週のデータをExcel形式で出力">
                                     <i class="fa-solid fa-file-excel mr-1 text-[11px]"></i>Excel出力
                                 </button>
                                 
-                                <button onclick="onWeekDropdownChange('${wKey}'); switchView('analytics');" class="text-xs text-brand-500 hover:text-brand-600 font-bold flex items-center bg-solid-50 hover:bg-solid-100 px-2 py-1 rounded border border-solid-200 transition-colors">
+                                <button type="button" onclick="onWeekDropdownChange('${escapeHTML(wKey)}'); switchView('analytics');" class="text-xs text-brand-500 hover:text-brand-600 font-bold flex items-center bg-solid-50 hover:bg-solid-100 px-2 py-1 rounded border border-solid-200 transition-colors">
                                     この週を表示 <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
                                 </button>
                             </div>
@@ -2382,10 +2508,10 @@
                                 <div class="flex items-center justify-between text-xs text-solid-700 bg-solid-50 border border-solid-200 p-2 rounded">
                                     <div class="flex items-center space-x-2 overflow-hidden">
                                         <span class="w-4 h-4 rounded-sm ${rank.bgClass} border flex items-center justify-center text-[9px] font-black">${rank.rank}</span>
-                                        <span class="font-semibold text-solid-900 whitespace-nowrap">${r.rep}</span>
+                                        <span class="font-semibold text-solid-900 whitespace-nowrap">${escapeHTML(r.rep)}</span>
                                         <span class="text-solid-300">|</span>
-                                        <span class="truncate text-solid-700 font-medium">${r.title}</span>
-                                        ${r.amount > 0 ? `<span class="text-[10px] font-bold text-brand-600">(¥${Number(r.amount).toLocaleString()}${r.month ? ' / ' + r.month : ''})</span>` : ''}
+                                        <span class="truncate text-solid-700 font-medium">${escapeHTML(r.title)}</span>
+                                        ${r.amount > 0 ? `<span class="text-[10px] font-bold text-brand-600">(¥${Number(r.amount).toLocaleString()}${r.month ? ' / ' + escapeHTML(r.month) : ''})</span>` : ''}
                                     </div>
                                     <span class="ml-2 whitespace-nowrap">${getStatusBadgeHTML(r.status)}</span>
                                 </div>
@@ -2400,31 +2526,105 @@
             container.innerHTML = html;
         }
 
-        // VIEW SWITCHER
-        function switchView(viewName) {
-            document.getElementById('tableView').classList.add('hidden');
-            document.getElementById('analyticsView').classList.add('hidden');
-            document.getElementById('historyView').classList.add('hidden');
+        function renderAll() {
+            // Guard: ensure current week exists
+            if (!appState.weeks[appState.currentWeekMondayStr]) {
+                appState.weeks[appState.currentWeekMondayStr] = {
+                    mondayStr: appState.currentWeekMondayStr,
+                    records: []
+                };
+            }
 
-            const defaultClasses = "w-full flex items-center space-x-3 px-3.5 py-2.5 rounded text-xs font-semibold text-solid-300 hover:bg-solid-900 hover:text-white transition-colors duration-100 text-left";
-            document.getElementById('sideTabTable').className = defaultClasses;
-            document.getElementById('sideTabAnalytics').className = defaultClasses;
-            document.getElementById('sideTabHistory').className = defaultClasses;
+            const currentWeekInfo = getWeekInfo(appState.currentWeekMondayStr);
 
-            if (viewName === 'analytics') {
-                document.getElementById('analyticsView').classList.remove('hidden');
-                document.getElementById('sideTabAnalytics').className = defaultClasses + " nav-item-active";
+            // Update Week Headers
+            const tableWeekTitle = document.getElementById('tableWeekTitle');
+            const tableWeekRange = document.getElementById('tableWeekRange');
+            if (tableWeekTitle) tableWeekTitle.textContent = currentWeekInfo.title;
+            if (tableWeekRange) tableWeekRange.innerHTML = `<i class="fa-regular fa-calendar mr-1 opacity-80"></i><span>${escapeHTML(currentWeekInfo.range)}</span>`;
+
+            const analyticsWeekTitle = document.getElementById('analyticsWeekTitle');
+            const analyticsWeekRange = document.getElementById('analyticsWeekRange');
+            if (analyticsWeekTitle) analyticsWeekTitle.textContent = currentWeekInfo.title;
+            if (analyticsWeekRange) analyticsWeekRange.innerHTML = `<i class="fa-regular fa-calendar mr-1 opacity-80"></i><span>${escapeHTML(currentWeekInfo.range)}</span>`;
+
+            // Update Week Dropdowns
+            const weekKeys = Object.keys(appState.weeks).sort().reverse();
+            const dropdownIds = ['tableWeekSelectDropdown', 'weekSelectDropdown'];
+
+            dropdownIds.forEach(id => {
+                const select = document.getElementById(id);
+                if (!select) return;
+
+                select.innerHTML = '';
+                weekKeys.forEach(weekKey => {
+                    const weekInfo = getWeekInfo(weekKey);
+                    const option = document.createElement('option');
+                    option.value = weekKey;
+                    option.textContent = weekInfo.title;
+                    select.appendChild(option);
+                });
+
+                select.value = appState.currentWeekMondayStr;
+            });
+
+            syncSortDropdown();
+            renderTable();
+
+            // Refresh currently visible view
+            const analyticsView = document.getElementById('analyticsView');
+            const historyView = document.getElementById('historyView');
+
+            if (analyticsView && !analyticsView.classList.contains('hidden')) {
                 renderAnalytics();
-            } else if (viewName === 'table') {
-                document.getElementById('tableView').classList.remove('hidden');
-                document.getElementById('sideTabTable').className = defaultClasses + " nav-item-active";
-                renderTable();
-            } else if (viewName === 'history') {
-                document.getElementById('historyView').classList.remove('hidden');
-                document.getElementById('sideTabHistory').className = defaultClasses + " nav-item-active";
+            }
+
+            if (historyView && !historyView.classList.contains('hidden')) {
                 renderHistory();
             }
         }
+
+        window.toggleMobileSidebar = toggleMobileSidebar;
+        window.switchView = switchView;
+        window.toggleConcernResolved = toggleConcernResolved;
+        window.openRecordModal = openRecordModal;
+        window.closeRecordModal = closeRecordModal;
+        window.handleSaveRecord = handleSaveRecord;
+        window.deleteRecord = deleteRecord;
+        window.openNewWeekModal = openNewWeekModal;
+        window.closeNewWeekModal = closeNewWeekModal;
+        window.handleCreateNewWeek = handleCreateNewWeek;
+        window.openRepManageModal = openRepManageModal;
+        window.closeRepManageModal = closeRepManageModal;
+        window.handleAddNewRep = handleAddNewRep;
+        window.editRepName = editRepName;
+        window.deleteRep = deleteRep;
+        window.chooseSaveFileLocation = chooseSaveFileLocation;
+        window.reconnectLastFileHandle = reconnectLastFileHandle;
+        window.exportHistoryToExcel = exportHistoryToExcel;
+        window.saveDataToFile = saveDataToFile;
+        window.restoreDataFromFile = restoreDataFromFile;
+        window.handleFallbackFileSelected = handleFallbackFileSelected;
+        window.closeRestoreModal = closeRestoreModal;
+        window.executeRestore = executeRestore;
+        window.toggleSort = toggleSort;
+        window.onSortDropdownChange = onSortDropdownChange;
+        window.navigateWeek = navigateWeek;
+        window.onWeekDropdownChange = onWeekDropdownChange;
+        window.jumpToCurrentWeek = jumpToCurrentWeek;
+        window.toggleAccountingMonthVisibility = toggleAccountingMonthVisibility;
+        window.renderTable = renderTable;
+        window.renderAnalytics = renderAnalytics;
+        window.renderHistory = renderHistory;
+        window.renderAll = renderAll;
+        window.restoreStateFromPersistence = restoreStateFromPersistence;
+        window.renderRepDropdowns = renderRepDropdowns;
+
+        // --- ENTRY POINT ---
+        window.onload = async function() {
+            await restoreStateFromPersistence();
+            switchView('table');
+        };
     </script>
 </body>
 </html>
