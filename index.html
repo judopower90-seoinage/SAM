@@ -453,6 +453,45 @@
                     </div>
                 </div>
 
+                <!-- TOP SECTION: Weekly Revenue / Order Summary Card -->
+                <div class="solid-card p-4 rounded-lg space-y-3 border-l-4 border-l-emerald-500">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-solid-200 pb-2.5">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-7 h-7 rounded bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center justify-center text-xs font-bold">
+                                <i class="fa-solid fa-yen-sign"></i>
+                            </span>
+                            <div>
+                                <h3 class="text-xs font-bold text-solid-900 uppercase tracking-wide">今週の受注計上サマリー</h3>
+                                <p class="text-[11px] text-solid-500">今週登録された案件における計上総額および月別の計上予定一覧です</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-1">
+                        <!-- Total Amount Box -->
+                        <div class="bg-solid-50 p-4 rounded border border-solid-200 flex flex-col justify-center space-y-1.5">
+                            <div class="text-[11px] font-semibold text-solid-500">今週の登録案件における計上総額</div>
+                            <div class="text-3xl font-black text-solid-900 tracking-tight" id="analyticsTotalAmount">
+                                ¥0
+                            </div>
+                            <div class="text-xs text-solid-500" id="analyticsAmountDetail">
+                                計上対象案件: 0件
+                            </div>
+                        </div>
+
+                        <!-- Month breakdown list -->
+                        <div class="lg:col-span-2 bg-solid-50/50 p-3.5 rounded border border-solid-200 flex flex-col justify-between">
+                            <div class="text-xs font-bold text-solid-700 mb-2 flex items-center justify-between">
+                                <span>月別 計上予定一覧</span>
+                                <i class="fa-regular fa-calendar-check text-brand-500 text-xs"></i>
+                            </div>
+                            <div id="analyticsMonthBreakdown" class="space-y-1.5 max-h-36 overflow-y-auto custom-scrollbar pr-1 text-xs">
+                                <!-- Dynamic Month Breakdown Items -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- KPI Cards Grid -->
                 <div id="kpiContainer" class="grid grid-cols-2 lg:grid-cols-5 gap-3">
                     <div class="solid-card p-4 rounded-lg flex flex-col justify-between">
@@ -511,45 +550,13 @@
                     </div>
                 </div>
 
-                <!-- Analytics Charts & Summary Area (Row 1) -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <!-- Status Breakdown Chart -->
-                    <div class="solid-card p-4 rounded-lg">
-                        <h3 class="text-xs font-bold text-solid-900 mb-3 flex items-center uppercase tracking-wide">
-                            <i class="fa-solid fa-chart-pie text-brand-500 mr-2 text-xs"></i>今週のステータス別内訳
-                        </h3>
-                        <div class="relative h-60 flex items-center justify-center">
-                            <canvas id="statusChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Weekly Revenue / Order Summary Card -->
-                    <div class="solid-card p-4 rounded-lg flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-xs font-bold text-solid-900 mb-3 flex items-center uppercase tracking-wide">
-                                <i class="fa-solid fa-yen-sign text-emerald-600 mr-2 text-xs"></i>今週の受注計上サマリー
-                            </h3>
-                            <div class="bg-solid-50 p-3.5 rounded border border-solid-200 space-y-2">
-                                <div class="text-[11px] font-semibold text-solid-500">今週の登録案件における計上総額</div>
-                                <div class="text-2xl font-black text-solid-900 tracking-tight" id="analyticsTotalAmount">
-                                    ¥0
-                                </div>
-                                <div class="text-xs text-solid-500" id="analyticsAmountDetail">
-                                    計上対象案件: 0件
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Month breakdown list -->
-                        <div class="mt-3 pt-3 border-t border-solid-200">
-                            <div class="text-xs font-bold text-solid-700 mb-2 flex items-center justify-between">
-                                <span>月別 計上予定一覧</span>
-                                <i class="fa-regular fa-calendar-check text-brand-500 text-xs"></i>
-                            </div>
-                            <div id="analyticsMonthBreakdown" class="space-y-1 max-h-28 overflow-y-auto custom-scrollbar pr-1 text-xs">
-                                <!-- Dynamic Month Breakdown Items -->
-                            </div>
-                        </div>
+                <!-- Status Breakdown Chart (Row 2) -->
+                <div class="solid-card p-4 rounded-lg">
+                    <h3 class="text-xs font-bold text-solid-900 mb-3 flex items-center uppercase tracking-wide">
+                        <i class="fa-solid fa-chart-pie text-brand-500 mr-2 text-xs"></i>今週のステータス別内訳
+                    </h3>
+                    <div class="relative h-60 flex items-center justify-center">
+                        <canvas id="statusChart"></canvas>
                     </div>
                 </div>
 
