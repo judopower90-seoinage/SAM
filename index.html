@@ -550,16 +550,6 @@
                     </div>
                 </div>
 
-                <!-- Status Breakdown Chart (Row 2) -->
-                <div class="solid-card p-4 rounded-lg">
-                    <h3 class="text-xs font-bold text-solid-900 mb-3 flex items-center uppercase tracking-wide">
-                        <i class="fa-solid fa-chart-pie text-brand-500 mr-2 text-xs"></i>今週のステータス別内訳
-                    </h3>
-                    <div class="relative h-60 flex items-center justify-center">
-                        <canvas id="statusChart"></canvas>
-                    </div>
-                </div>
-
                 <!-- Weekly Concerns & Problem Issues (With Resolve Action) -->
                 <div class="solid-card p-4 rounded-lg space-y-3 border-l-4 border-l-amber-500">
                     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-solid-200 pb-2.5">
@@ -603,6 +593,16 @@
                     <!-- Rep Revenue Grid / List Container -->
                     <div id="repRevenueListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
                         <!-- Dynamic Rep Revenue Cards -->
+                    </div>
+                </div>
+
+                <!-- Status Breakdown Chart (Moved to the bottom) -->
+                <div class="solid-card p-4 rounded-lg">
+                    <h3 class="text-xs font-bold text-solid-900 mb-3 flex items-center uppercase tracking-wide">
+                        <i class="fa-solid fa-chart-pie text-brand-500 mr-2 text-xs"></i>今週のステータス別内訳
+                    </h3>
+                    <div class="relative h-60 flex items-center justify-center">
+                        <canvas id="statusChart"></canvas>
                     </div>
                 </div>
             </section>
